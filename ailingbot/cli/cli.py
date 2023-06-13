@@ -181,12 +181,6 @@ async def bot_chat(
     )
     click.echo(
         click.style(
-            text=f'{emoji.emojize(":light_bulb:")} Broker: {settings.broker.name}',
-            fg='cyan',
-        )
-    )
-    click.echo(
-        click.style(
             text=f'{emoji.emojize(":light_bulb:")} Policy: {settings.policy.name}',
             fg='cyan',
         )
