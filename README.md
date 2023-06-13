@@ -10,6 +10,7 @@ AilingBot - An all-in-one solution to empower your IM bot with AI.
 
 # Highlights
 
+- 💯**Open source&Free**: The entire project is completely open source and free.
 - 📦**Out of the box**: No development is required, with pre-built capabilities to integrate with mainstream IM and LLM
   models.
 - 🧩**Modular**: The project is organized in a modular way, with modules depending on abstract protocols, and similar
