@@ -1,5 +1,9 @@
 [🇨🇳简体中文](https://github.com/ericzhang-cn/ailingbot/blob/main/README_Chinese.md)
 
+---
+
+![Python package workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/python-package.yml/badge.svg)
+
 <img src="./img/logo.png" alt="logo" width="50"/>
 
 AilingBot - An all-in-one solution to empower your IM bot with AI.
@@ -8,15 +12,18 @@ AilingBot - An all-in-one solution to empower your IM bot with AI.
 
 - 📦**Out of the box**: No development is required, with pre-built capabilities to integrate with mainstream IM and LLM
   models.
-- 🧩**Modular**: The project is organized in a modular way, with modules depending on abstract protocols, and similar modules
+- 🧩**Modular**: The project is organized in a modular way, with modules depending on abstract protocols, and similar
+  modules
   implementing the protocols for plug-and-play functionality.
-- 💻**Extensible**: Thanks to the modular organization, AilingBot can be extended to new usage scenarios and capabilities by
+- 💻**Extensible**: Thanks to the modular organization, AilingBot can be extended to new usage scenarios and capabilities
+  by
   implementing custom modules based on the module protocols, such as integrating with new IMs, large models, or
   developing custom chat policy.
 - 🚀**High Performance**: AilingBot uses coroutine-based asynchronous mode to improve the system's high-concurrency
   performance. Meanwhile, the core servers can start multiple processes to further improve the system's high-concurrency
   processing capabilities.
-- 🔌**API**: AilingBot provides a clear set of endpoints as its API interface, facilitating integration and coordination with
+- 🔌**API**: AilingBot provides a clear set of endpoints as its API interface, facilitating integration and coordination
+  with
   other systems and processes.
 
 # Quickstart Guide

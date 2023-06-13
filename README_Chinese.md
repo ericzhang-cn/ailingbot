@@ -1,5 +1,9 @@
 [🇬🇧English](https://github.com/ericzhang-cn/ailingbot/blob/main/README.md)
 
+---
+
+![Python package workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/python-package.yml/badge.svg)
+
 <img src="./img/logo.png" alt="logo" width="50"/>
 
 AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。
