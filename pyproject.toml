@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "ailingbot"
+version = "0.1.0"
+description = "An all-in-one solution to empower your IM bot with LLM."
+authors = ["ericzhang <ericzhang.buaa@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+pydantic = "^1.10.2"
+cryptography = "^38.0.3"
+arrow = "^1.2.3"
+dynaconf = "^3.1.11"
+fastapi = "^0.86.0"
+xmltodict = "^0.13.0"
+uvicorn = "^0.19.0"
+loguru = "^0.6.0"
+pika = "^1.3.1"
+aio-pika = "^8.2.4"
+aiohttp = { version = "^3.8.3", extras = ["speedups"] }
+aioredis = "^2.0.1"
+tomli = "^2.0.1"
+babel = "^2.11.0"
+click = "^8.1.3"
+asgiref = "^3.5.2"
+tabulate = { version = "^0.9.0", extras = ["widechars"] }
+emoji = "^2.2.0"
+prompt-toolkit = "^3.0.33"
+langchain = "^0.0.192"
+openai = "^0.27.8"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.0"
+sphinx = "^5.3.0"
+pytest-asyncio = "^0.20.1"
+blue = "^0.9.1"
+
+[tool.poetry.scripts]
+ailingbot = "ailingbot.cli.cli:command_line_tools"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
