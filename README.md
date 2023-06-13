@@ -12,9 +12,9 @@ AilingBot - An all-in-one solution to empower your IM bot with AI.
   implementing the protocols for plug-and-play functionality.
 - 💻**Extensible**: Thanks to the modular organization, AilingBot can be extended to new usage scenarios and capabilities by
   implementing custom modules based on the module protocols, such as integrating with new IMs, large models, or
-  developing custom dialog strategies.
+  developing custom chat policy.
 - 🚀**High Performance**: AilingBot uses coroutine-based asynchronous mode to improve the system's high-concurrency
-  performance. Meanwhile, the core process can start multiple processes to further improve the system's high-concurrency
+  performance. Meanwhile, the core servers can start multiple processes to further improve the system's high-concurrency
   processing capabilities.
 - 🔌**API**: AilingBot provides a clear set of endpoints as its API interface, facilitating integration and coordination with
   other systems and processes.
