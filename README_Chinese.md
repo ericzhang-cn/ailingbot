@@ -152,7 +152,7 @@ ailingbot channel serve_webhook
 启动Bot Serve进程，这个进程的作用是监听通过Webhook接收到的用户消息，并按对应会话策略生成回复消息：
 
 ```shell
-ailingbot channel serve_webhook
+ailingbot bot serve
 ```
 
 启动Channel Agent进程，这个进程的作用是将Bot Serve进程回复的消息发送给用户：
