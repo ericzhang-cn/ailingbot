@@ -185,11 +185,15 @@ ailingbot channel serve_agent
 
 Finally, we need to go to the WeChat Work management console to configure the webhook address so that WeChat Work knows
 to forward the received user messages to our webhook.
-The webhook URL is: http(s)://your_public_IP:8080/webhook/wechatwork/event/
+The webhook URL is: `http(s)://your_public_IP:8080/webhook/wechatwork/event/`
 
 After completing the above configuration, you can find the bot in WeChat Work and start a conversation:
 
 <img src="./img/wechatwork-screenshot.png" alt="WeChat Work Bot" width="400"/>
+
+# Architecture Overview
+
+![architecture](./img/architecture.png)
 
 # Roadmap
 

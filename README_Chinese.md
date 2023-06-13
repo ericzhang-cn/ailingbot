@@ -163,11 +163,15 @@ ailingbot channel serve_agent
 ### 配置Webhook
 
 最后我们需要去企业微信的管理后台，将webhook地址配置好，以便企业微信知道将接收到的用户消息转发到我们的webhook。
-Webhook的URL为：http(s)://你的公网IP:8080/webhook/wechatwork/event/
+Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
 
 完成以上配置后，就可以在企业微信中找到机器人，进行对话了：
 
 <img src="./img/wechatwork-screenshot.png" alt="企业微信机器人" width="400"/>
+
+# 架构概览
+
+![architecture](./img/architecture.png)
 
 # 发展计划
 
