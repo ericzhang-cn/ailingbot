@@ -4,7 +4,6 @@ import base64
 import hashlib
 import socket
 import struct
-import typing
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
