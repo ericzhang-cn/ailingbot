@@ -120,23 +120,20 @@ To connect to WeChat Work, in addition to the prerequisites above, you also need
 Since connecting to instant messaging tools requires configuring many environment variables, AilingBot provides a
 template file: .env.example, which can be copied and renamed to .env. Its contents are as follows:
 
-```shell
+```text
 AILINGBOT_LANG="zh_CN"
 AILINGBOT_TZ="Asia/Shanghai"
 
 AILINGBOT_BROKER__NAME="pika"
 AILINGBOT_BROKER__ARGS="{'host'='localhost'}"
 
-AILINGBOT_POLICY__NAME="input_output"
-AILINGBOT_POLICY__ARGS="{llm_name='openai',llm_args={model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key
-here',temperature=0}}"
+AILINGBOT_POLICY__NAME="lc_conversation_chain"
+AILINGBOT_POLICY__ARGS="{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
 
 AILINGBOT_CHANNEL__AGENT__NAME="wechatwork"
-AILINGBOT_CHANNEL__AGENT__ARGS="{corpid='Your WechatWork corp id here',corpsecret='Your WechatWork corp secret here'
-,agentid=0}"
+AILINGBOT_CHANNEL__AGENT__ARGS="{corpid='Your WechatWork corp id here',corpsecret='Your WechatWork corp secret here',agentid=0}"
 AILINGBOT_CHANNEL__WEBHOOK__NAME="wechatwork"
-AILINGBOT_CHANNEL__WEBHOOK__ARGS="{token='Your WechatWork webhook token here',aes_key='Your WechatWork webhook AES key
-here'}"
+AILINGBOT_CHANNEL__WEBHOOK__ARGS="{token='Your WechatWork webhook token here',aes_key='Your WechatWork webhook AES key here'}"
 AILINGBOT_CHANNEL__UVICORN__ARGS="{host='0.0.0.0',port='8080'}"
 ```
 
@@ -198,7 +195,7 @@ After completing the above configuration, you can find the bot in WeChat Work an
 
 - [ ] Provide comprehensive user and developer documentation.
 - [ ] Support more IM platforms, such as DingTalk, Feishu, and Slack.
-- [ ] Support more commonly used LLM prompting paradigms and out-of-the-box dialog strategies.
+- [ ] Support more commonly used LLM prompting paradigms and out-of-the-box chat policy.
 - [ ] Provide support for commonly used capabilities in LLM Chain, such as Vector Embedding&Query and Grounding.
 - [ ] Provide a WebUI.
 - [ ] Provide one-click deployment capability based on Docker containers.
