@@ -17,7 +17,7 @@ class ChatPolicy(AbstractAsyncComponent, abc.ABC):
 
     @abc.abstractmethod
     async def respond(
-        self, *, conversation_id: str, message: RequestMessage
+            self, *, conversation_id: str, message: RequestMessage
     ) -> ResponseMessage:
         """Responding to user inputs.
 
@@ -39,10 +39,12 @@ class ChatPolicy(AbstractAsyncComponent, abc.ABC):
         :return: Policy instance.
         :rtype: ChatPolicy
         """
-        if name.lower() == 'input_output':
-            from ailingbot.chat.policies.common import InputOutputChatPolicy
-
-            instance = InputOutputChatPolicy(debug=debug, **kwargs)
+        if name.lower() == 'lc_chain':
+            from ailingbot.chat.policies.langchain import LCChainChatPolicy
+            instance = LCChainChatPolicy(debug=debug, **kwargs)
+        elif name.lower() == 'lc_conversation_chain':
+            from ailingbot.chat.policies.langchain import LCConversationChain
+            instance = LCConversationChain(debug=debug, **kwargs)
         else:
             instance = get_class_dynamically(name)(debug=debug, **kwargs)
 

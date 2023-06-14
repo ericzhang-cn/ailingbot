@@ -10,16 +10,14 @@ AilingBot - An all-in-one solution to empower your IM bot with AI.
 
 # Highlights
 
-- 💯**Open source&Free**: The entire project is completely open source and free.
+- 💯**Open source&Free**: Completely open source and free.
 - 📦**Out of the box**: No development is required, with pre-built capabilities to integrate with mainstream IM and LLM
   models.
+- 🔗**Integrated LangChain**: The ability to integrate LangChain allows for the direct use of LangChain's pre-existing chains or agents.
 - 🧩**Modular**: The project is organized in a modular way, with modules depending on abstract protocols, and similar
   modules
   implementing the protocols for plug-and-play functionality.
-- 💻**Extensible**: Thanks to the modular organization, AilingBot can be extended to new usage scenarios and capabilities
-  by
-  implementing custom modules based on the module protocols, such as integrating with new IMs, large models, or
-  developing custom chat policy.
+- 💻**Extensible**: It can expand the usage scenarios and capabilities of AilingBot. For example, integrating with new instant messaging platforms, new language learning models, or developing their own chains, agents, and chat policy.
 - 🚀**High Performance**: AilingBot uses coroutine-based asynchronous mode to improve the system's high-concurrency
   performance. Meanwhile, the core servers can start multiple processes to further improve the system's high-concurrency
   processing capabilities.
