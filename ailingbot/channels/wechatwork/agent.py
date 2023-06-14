@@ -8,6 +8,7 @@ import arrow
 from ailingbot.channels.channel import ChannelAgent
 from ailingbot.channels.wechatwork.render import render
 from ailingbot.chat.messages import ResponseMessage, MessageScope
+from ailingbot.config import settings
 from ailingbot.shared.errors import ExternalHTTPAPIError
 
 
@@ -18,30 +19,15 @@ class WechatworkAgent(ChannelAgent):
         self,
         *,
         num_of_tasks: int = 1,
-        broker_name: str,
-        broker_args: dict,
-        corpid: str,
-        corpsecret: str,
-        agentid: int,
     ):
-        """Initializes class.
-
-        :param corpid: Wechatwork open platform corpid.
-        :type corpid: str
-        :param corpsecret:  Wechatwork open platform corpsecret.
-        :type corpsecret: str
-        :param agentid:  Wechatwork open platform agent id.
-        :type agentid: str
-        """
+        """Initializes class."""
         super(WechatworkAgent, self).__init__(
             num_of_tasks=num_of_tasks,
-            broker_name=broker_name,
-            broker_args=broker_args,
         )
 
-        self.corpid = corpid
-        self.corpsecret = corpsecret
-        self.agentid = agentid
+        self.corpid = settings.channel.agent.args.corpid
+        self.corpsecret = settings.channel.agent.args.corpsecret
+        self.agentid = settings.channel.agent.args.agentid
         self.access_token: typing.Optional[str] = None
         self.expire_in: typing.Optional[arrow.Arrow] = None
 

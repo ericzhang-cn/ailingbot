@@ -9,13 +9,14 @@ from functools import wraps
 import click
 import emoji
 import uvicorn
+from dynaconf import ValidationError
 from loguru import logger
 from prompt_toolkit import PromptSession
 from prompt_toolkit.formatted_text import FormattedText
 
 import ailingbot.shared.errors
 from ailingbot.channels.channel import ChannelAgent, ChannelWebhookFactory
-from ailingbot.chat.chatbot import ChatBot
+from ailingbot.chat.chatbot import ChatBot, BotRunMode
 from ailingbot.chat.messages import (
     TextRequestMessage,
     FallbackResponseMessage,
@@ -25,7 +26,7 @@ from ailingbot.chat.messages import (
 )
 from ailingbot.cli import options
 from ailingbot.cli.render import render
-from ailingbot.config import settings
+from ailingbot.config import settings, validators
 
 
 def _coro_cmd(f: typing.Callable) -> typing.Callable:
@@ -125,13 +126,35 @@ def bot_serve(
     """
     _set_logger(sink=log_file, level=log_level)
 
+    if broker:
+        settings.set('broker.name', broker)
+    if broker_args:
+        settings.set('broker.args', broker_args)
+    if policy:
+        settings.set('policy.name', policy)
+    if policy_args:
+        settings.set('policy.args', policy_args)
+
+    settings.validators.clear()
+    settings.validators.register(validators['broker.name'])
+    settings.validators.register(validators['broker.args'])
+    settings.validators.register(validators['policy.name'])
+    settings.validators.register(validators['policy.args'])
+    try:
+        settings.validators.validate()
+    except ValidationError as e:
+        click.echo(
+            click.style(
+                text=f'Configuration validation failed. Detail: {e.message}',
+                fg='red',
+            )
+        )
+        raise click.Abort()
+
     chatbot = ChatBot(
         num_of_tasks=number_of_tasks,
+        run_mode=BotRunMode.Broker,
         debug=debug,
-        broker_name=broker,
-        broker_args=broker_args,
-        policy_name=policy,
-        policy_args=policy_args,
     )
 
     try:
@@ -161,10 +184,28 @@ async def bot_chat(
     :param debug: Whether to enable debug mode.
     :type debug: bool
     """
+    if policy:
+        settings.set('policy.name', policy)
+    if policy_args:
+        settings.set('policy.args', policy_args)
+
+    settings.validators.clear()
+    settings.validators.register(validators['policy.name'])
+    settings.validators.register(validators['policy.args'])
+    try:
+        settings.validators.validate()
+    except ValidationError as e:
+        click.echo(
+            click.style(
+                text=f'Configuration validation failed. Detail: {e.message}',
+                fg='red',
+            )
+        )
+        raise click.Abort()
+
     chatbot = ChatBot(
+        run_mode=BotRunMode.Standalone,
         debug=debug,
-        policy_name=policy,
-        policy_args=policy_args,
     )
     try:
         await chatbot.startup()
@@ -286,12 +327,34 @@ def channel_serve_agent(
     """
     _set_logger(sink=log_file, level=log_level)
 
+    if channel_agent:
+        settings.set('channel.agent.name', channel_agent)
+    if channel_agent_args:
+        settings.set('channel.agent.args', channel_agent_args)
+    if broker:
+        settings.set('broker.name', broker)
+    if broker_args:
+        settings.set('broker.args', broker_args)
+
+    settings.validators.clear()
+    settings.validators.register(validators['broker.name'])
+    settings.validators.register(validators['broker.args'])
+    settings.validators.register(validators['channel.agent.name'])
+    settings.validators.register(validators['channel.agent.args'])
+    try:
+        settings.validators.validate()
+    except ValidationError as e:
+        click.echo(
+            click.style(
+                text=f'Configuration validation failed. Detail: {e.message}',
+                fg='red',
+            )
+        )
+        raise click.Abort()
+
     agent = ChannelAgent.get_agent(
-        channel_agent,
+        settings.channel.agent.name,
         num_of_tasks=number_of_tasks,
-        broker_name=broker,
-        broker_args=broker_args,
-        **channel_agent_args,
     )
     try:
         agent.run()
@@ -321,17 +384,39 @@ async def channel_serve_webhook(
 ):
     _set_logger(sink=log_file, level=log_level)
 
+    if channel_webhook:
+        settings.set('channel.webhook.name', channel_webhook)
+    if channel_webhook_args:
+        settings.set('channel.webhook.args', channel_webhook_args)
+    if channel_uvicorn_args:
+        settings.set('channel.uvicorn.args', channel_uvicorn_args)
+    if broker:
+        settings.set('broker.name', broker)
+    if broker_args:
+        settings.set('broker.args', broker_args)
+
+    settings.validators.clear()
+    settings.validators.register(validators['broker.name'])
+    settings.validators.register(validators['broker.args'])
+    settings.validators.register(validators['channel.webhook.name'])
+    settings.validators.register(validators['channel.webhook.args'])
+    settings.validators.register(validators['channel.uvicorn.args'])
+    try:
+        settings.validators.validate()
+    except ValidationError as e:
+        click.echo(
+            click.style(
+                text=f'Configuration validation failed. Detail: {e.message}',
+                fg='red',
+            )
+        )
+        raise click.Abort()
+
     webhook = await ChannelWebhookFactory.get_webhook(
-        channel_webhook,
-        broker_name=broker,
-        broker_args=broker_args,
-        **channel_webhook_args,
+        settings.channel.webhook.name
     )
 
-    if 'app' in channel_uvicorn_args:
-        channel_uvicorn_args.pop('app')
-
-    config = uvicorn.Config(app=webhook, **channel_uvicorn_args)
+    config = uvicorn.Config(app=webhook, **settings.channel.uvicorn.args)
     server = uvicorn.Server(config)
     await server.serve()
 

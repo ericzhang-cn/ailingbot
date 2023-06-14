@@ -1,7 +1,7 @@
-import typing
+import abc
 import uuid
 
-from langchain import PromptTemplate, ConversationChain
+from langchain import ConversationChain
 from langchain.chains.base import Chain
 from langchain.memory import ConversationBufferMemory
 
@@ -28,13 +28,11 @@ class InputOutputChatPolicy(ChatPolicy):
         debug: bool = False,
         llm_name: str = 'openai',
         llm_args: dict,
-        prompt_template: typing.Optional[str] = None,
     ):
         super(InputOutputChatPolicy, self).__init__(debug=debug)
 
         self.llm = get_llm(llm_name, **llm_args)
         self.chain: dict[str, Chain] = {}
-        self.prompt_template = prompt_template
 
     async def respond(
         self, *, conversation_id: str, message: RequestMessage
@@ -44,22 +42,11 @@ class InputOutputChatPolicy(ChatPolicy):
             response.reason = 'InputOutputChatPolicy can only handle messages of type TextRequestMessage.'
         else:
             if conversation_id not in self.chain:
-                if self.prompt_template:
-                    self.chain[conversation_id] = ConversationChain(
-                        llm=self.llm,
-                        memory=ConversationBufferMemory(),
-                        prompt=PromptTemplate(
-                            template=self.prompt_template,
-                            input_variables=['input', 'history'],
-                        ),
-                        verbose=self.debug,
-                    )
-                else:
-                    self.chain[conversation_id] = ConversationChain(
-                        llm=self.llm,
-                        memory=ConversationBufferMemory(),
-                        verbose=self.debug,
-                    )
+                self.chain[conversation_id] = ConversationChain(
+                    llm=self.llm,
+                    memory=ConversationBufferMemory(),
+                    verbose=self.debug,
+                )
             r = await self.chain[conversation_id].arun(message.text)
             response = TextResponseMessage()
             response.text = r

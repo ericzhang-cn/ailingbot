@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import enum
 import typing
 import uuid
 
@@ -14,7 +15,15 @@ from ailingbot.chat.messages import (
     ResponseMessage,
 )
 from ailingbot.chat.policy import ChatPolicy
+from ailingbot.config import settings, validators
 from ailingbot.shared.abc import AbstractAsyncRunnable
+
+
+class BotRunMode(enum.Enum):
+    """Running mode of the bot."""
+
+    Broker = 'Broker'
+    Standalone = 'Standalone'
 
 
 class ChatBot(AbstractAsyncRunnable):
@@ -24,22 +33,15 @@ class ChatBot(AbstractAsyncRunnable):
         self,
         *,
         num_of_tasks: int = 1,
+        run_mode: BotRunMode = BotRunMode.Broker,
         debug: bool = False,
-        broker_name: typing.Optional[str] = None,
-        broker_args: typing.Optional[dict] = None,
-        policy_name: typing.Optional[str] = None,
-        policy_args: typing.Optional[dict] = None,
     ):
         super(ChatBot, self).__init__(num_of_tasks=num_of_tasks)
 
+        self.run_mode = run_mode
         self.debug = debug
+
         self.locks: dict[str, asyncio.Lock] = {}
-
-        self.broker_name = broker_name
-        self.broker_args = broker_args or {}
-        self.policy_name = policy_name
-        self.policy_args = policy_args or {}
-
         self.broker: typing.Optional[MessageBroker] = None
         self.policy: typing.Optional[ChatPolicy] = None
 
@@ -77,17 +79,19 @@ class ChatBot(AbstractAsyncRunnable):
             await self.broker.produce_response(response)
 
     async def _startup(self):
-        if self.broker_name is not None:
+        if self.run_mode == BotRunMode.Broker:
             self.broker = MessageBroker.get_broker(
-                self.broker_name, **self.broker_args
+                settings.broker.name,
+                **settings.broker.args,
             )
             await self.broker.initialize()
 
-        if self.policy_name is not None:
-            self.policy = ChatPolicy.get_policy(
-                self.policy_name, debug=self.debug, **self.policy_args
-            )
-            await self.policy.initialize()
+        self.policy = ChatPolicy.get_policy(
+            settings.policy.name,
+            debug=self.debug,
+            **settings.policy.args,
+        )
+        await self.policy.initialize()
 
     async def _main_task(self, *, number: int):
         try:

@@ -10,6 +10,7 @@ from loguru import logger
 import ailingbot.shared.errors
 from ailingbot.brokers.broker import MessageBroker
 from ailingbot.chat.messages import ResponseMessage
+from ailingbot.config import settings
 from ailingbot.shared.abc import AbstractAsyncRunnable
 from ailingbot.shared.misc import get_class_dynamically
 
@@ -17,13 +18,8 @@ from ailingbot.shared.misc import get_class_dynamically
 class ChannelAgent(AbstractAsyncRunnable, abc.ABC):
     """Base class of channel agents."""
 
-    def __init__(
-        self, *, num_of_tasks: int = 1, broker_name: str, broker_args: dict
-    ):
+    def __init__(self, *, num_of_tasks: int = 1):
         super(ChannelAgent, self).__init__(num_of_tasks=num_of_tasks)
-
-        self.broker_name = broker_name
-        self.broker_args = broker_args or {}
 
         self.broker: typing.Optional[MessageBroker] = None
 
@@ -38,7 +34,8 @@ class ChannelAgent(AbstractAsyncRunnable, abc.ABC):
 
     async def _startup(self) -> None:
         self.broker = MessageBroker.get_broker(
-            self.broker_name, **self.broker_args
+            settings.broker.name,
+            **settings.broker.args,
         )
         await self.broker.initialize()
 
@@ -54,28 +51,22 @@ class ChannelAgent(AbstractAsyncRunnable, abc.ABC):
         await self.broker.finalize()
 
     @staticmethod
-    def get_agent(
-        name: str, broker_name: str, broker_args: dict, **kwargs
-    ) -> ChannelAgent:
+    def get_agent(name: str, num_of_tasks: int = 1) -> ChannelAgent:
         """Gets channel agent instance.
 
         :param name: Built-in channel name or full path of agent class.
         :type name: str
-        :param broker_name:
-        :type broker_name:
-        :param broker_args:
-        :type broker_args:
+        :param num_of_tasks:
+        :type num_of_tasks:
         :return: Agent instance.
         :rtype: ChannelAgent
         """
         if name.lower() == 'wechatwork':
             from ailingbot.channels.wechatwork.agent import WechatworkAgent
 
-            instance = WechatworkAgent(
-                broker_name=broker_name, broker_args=broker_args, **kwargs
-            )
+            instance = WechatworkAgent(num_of_tasks=num_of_tasks)
         else:
-            instance = get_class_dynamically(name)(**kwargs)
+            instance = get_class_dynamically(name)(num_of_tasks=num_of_tasks)
 
         return instance
 
@@ -83,9 +74,8 @@ class ChannelAgent(AbstractAsyncRunnable, abc.ABC):
 class ChannelWebhookFactory(abc.ABC):
     """Base class of channel webhook factories."""
 
-    def __init__(self, *, broker_name: str, broker_args: dict):
-        self.broker_name = broker_name
-        self.broker_args = broker_args or {}
+    def __init__(self):
+        pass
 
     async def create_webhook_app(self) -> ASGIApplication | typing.Callable:
         """Creates a ASGI application.
@@ -96,17 +86,11 @@ class ChannelWebhookFactory(abc.ABC):
         raise NotImplementedError
 
     @staticmethod
-    async def get_webhook(
-        name: str, broker_name: str, broker_args: dict, **kwargs
-    ) -> ASGIApplication | typing.Callable:
+    async def get_webhook(name: str) -> ASGIApplication | typing.Callable:
         """Gets channel webhook ASGI application instance.
 
         :param name: Built-in channel name or full path of webhook factory class.
         :type name: str
-        :param broker_name:
-        :type broker_name:
-        :param broker_args:
-        :type broker_args:
         :return: Webhook ASGI application.
         :rtype: typing.Union[ASGIApplication, typing.Callable]
         """
@@ -115,10 +99,8 @@ class ChannelWebhookFactory(abc.ABC):
                 WechatworkWebhookFactory,
             )
 
-            factory = WechatworkWebhookFactory(
-                broker_name=broker_name, broker_args=broker_args, **kwargs
-            )
+            factory = WechatworkWebhookFactory()
         else:
-            factory = get_class_dynamically(name)(**kwargs)
+            factory = get_class_dynamically(name)()
 
         return await factory.create_webhook_app()

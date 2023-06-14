@@ -54,7 +54,7 @@ class ChatPolicyError(AilingBotError):
     pass
 
 
-class ConfigurationError(AilingBotError):
+class ConfigValidationError(AilingBotError):
     """Raised when configuration invalid."""
 
     pass

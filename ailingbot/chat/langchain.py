@@ -6,7 +6,7 @@ from langchain.llms.base import LLM
 from ailingbot.shared.misc import get_class_dynamically
 
 
-def get_llm(name: str, **kwargs) -> LLM:
+def get_llm(name: str, **kwargs) -> LLM | BaseChatModel:
     """Gets LangChain LLM instance.
 
     :param name: Built-in LLM name or full path of LLM class.
@@ -15,9 +15,9 @@ def get_llm(name: str, **kwargs) -> LLM:
     :rtype: BaseChatModel
     """
     if name.lower() == 'openai':
-        from langchain.llms import OpenAI
+        from langchain.chat_models import ChatOpenAI
 
-        instance = OpenAI(**kwargs)
+        instance = ChatOpenAI(**kwargs)
     elif name.lower() == 'azure':
         from langchain.llms import AzureOpenAI
 

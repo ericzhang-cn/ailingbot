@@ -13,28 +13,23 @@ from ailingbot.brokers.broker import MessageBroker
 from ailingbot.channels.channel import ChannelWebhookFactory
 from ailingbot.channels.wechatwork.encrypt import signature, decrypt
 from ailingbot.chat.messages import TextRequestMessage, MessageScope
+from ailingbot.config import settings
 
 
 class WechatworkWebhookFactory(ChannelWebhookFactory):
     """Factory that creates wechatwork webhook ASGI application."""
 
-    def __init__(
-        self, *, broker_name: str, broker_args: dict, token: str, aes_key: str
-    ):
-        super(WechatworkWebhookFactory, self).__init__(
-            broker_name=broker_name, broker_args=broker_args
-        )
+    def __init__(self):
+        super(WechatworkWebhookFactory, self).__init__()
 
-        self.token = token
-        self.aes_key = aes_key
+        self.token = settings.channel.webhook.args.token
+        self.aes_key = settings.channel.webhook.args.aes_key
 
         self.broker: typing.Optional[MessageBroker] = None
         self.app: typing.Optional[ASGIApplication | typing.Callable] = None
 
     async def create_webhook_app(self) -> ASGIApplication | typing.Callable:
-        self.broker = MessageBroker.get_broker(
-            self.broker_name, **self.broker_args
-        )
+        self.broker = MessageBroker.get_broker(settings.broker.name)
         self.app = FastAPI()
 
         @self.app.on_event('startup')
