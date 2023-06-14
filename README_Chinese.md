@@ -40,8 +40,8 @@ AilingBot的开发哲学鼓励将配置放在环境变量中，当然你也可�
 设置环境变量命令：
 
 ```shell
-export AILINGBOT_POLICY__NAME="input_output"
-export AILINGBOT_POLICY__ARGS="{llm_name='openai',llm_args={model_name='gpt-3.5-turbo',openai_api_key='这里填入你的OpenAI API key',temperature=0}}"
+export AILINGBOT_POLICY__NAME="lc_conversation_chain"
+export AILINGBOT_POLICY__ARGS="{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
 ```
 
 ### 启动机器人
@@ -88,7 +88,7 @@ ailingbot bot chat
 如果没有设置环境变量，则需要通过启动参数传入必要信息：
 
 ```shell
-ailingbot bot chat --policy input_output --policy-args "{llm_name='openai',llm_args={model_name='gpt-3.5-turbo',openai_api_key='这里填入你的OpenAI API key',temperature=0}}"
+ailingbot bot chat --policy lc_conversation_chain --policy-args "{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
 ```
 
 此时你可以通过一个交互式对话环境与机器人进行对话，如下图所示：

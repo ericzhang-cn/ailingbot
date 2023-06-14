@@ -46,8 +46,8 @@ skip this step and pass in the required information dynamically when running the
 Set environment variable commands:
 
 ```shell
-export AILINGBOT_POLICY__NAME="input_output"
-export AILINGBOT_POLICY__ARGS="{llm_name='openai',llm_args={model_name='gpt-3.5-turbo',openai_api_key='这里填入你的OpenAI API key',temperature=0}}"
+export AILINGBOT_POLICY__NAME="lc_conversation_chain"
+export AILINGBOT_POLICY__ARGS="{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
 ```
 
 ### Start the Bot
@@ -94,7 +94,7 @@ ailingbot bot chat
 If you have not set environment variables, you need to pass in the required information through start parameters:
 
 ```shell
-ailingbot bot chat --policy input_output --policy-args "{llm_name='openai',llm_args={model_name='gpt-3.5-turbo',openai_api_key='这里填入你的OpenAI API key',temperature=0}}"
+ailingbot bot chat --policy lc_conversation_chain --policy-args "{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
 ```
 
 You can now start an interactive conversation with the bot, as shown in the following screenshot:
