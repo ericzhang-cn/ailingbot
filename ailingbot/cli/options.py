@@ -10,10 +10,10 @@ class TableParamType(click.ParamType):
     name = 'table'
 
     def convert(
-        self,
-        value: typing.Any,
-        param: typing.Optional[click.Parameter],
-        ctx: typing.Optional[click.Context],
+            self,
+            value: typing.Any,
+            param: typing.Optional[click.Parameter],
+            ctx: typing.Optional[click.Context],
     ) -> typing.Any:
         if value is None:
             return None
@@ -35,6 +35,13 @@ class TableParamType(click.ParamType):
 
 
 env_var_prefix = 'AILINGBOT'
+
+config_file_option = click.option(
+    '-c',
+    '--config-file',
+    type=click.Path(),
+    help='Configuration file path.',
+)
 
 broker_name_option = click.option(
     '--broker',

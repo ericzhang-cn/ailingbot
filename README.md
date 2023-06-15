@@ -8,7 +8,7 @@
 
 AilingBot - An all-in-one solution to empower your IM bot with AI.
 
-# Highlights
+# Features
 
 - 💯**Open source&Free**: Completely open source and free.
 - 📦**Out of the box**: No development is required, with pre-built capabilities to integrate with mainstream IM and LLM
@@ -38,17 +38,25 @@ Please make sure you have the following environments installed on your machine:
 - You also need an OpenAI API key. If you don't have one, please apply for it
   here: https://platform.openai.com/account/api-keys
 
-### Set Environment Variables (Optional)
+### Modify configuration file
 
-AilingBot's development philosophy encourages configurations to be placed in environment variables. However, you can
-skip this step and pass in the required information dynamically when running the start command.
-
-Set environment variable commands:
+Copy the configuration file template and rename it:
 
 ```shell
-export AILINGBOT_POLICY__NAME="lc_conversation_chain"
-export AILINGBOT_POLICY__ARGS="{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
+cp settings.example.toml settings.toml
 ```
+
+Modify the necessary configuration and start the bot with only one configuration item. Find the following section in settings.toml:
+
+```toml
+[policy.args.lc_chain_config.llm]
+_type = "openai"
+model_name = "gpt-3.5-turbo"
+openai_api_key = "Your OpenAI API key"
+temperature = 0
+```
+
+Change the value of `openai_api_key` to your actual OpenAI API key.
 
 ### Start the Bot
 
@@ -85,16 +93,10 @@ Commands:
   channel  Channel commands.
 ```
 
-If you have set environment variables earlier, you can start the bot with the following command:
+Start the bot with the following command:
 
 ```shell
-ailingbot bot chat
-```
-
-If you have not set environment variables, you need to pass in the required information through start parameters:
-
-```shell
-ailingbot bot chat --policy lc_conversation_chain --policy-args "{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
+ailingbot bot chat -c settings.toml
 ```
 
 You can now start an interactive conversation with the bot, as shown in the following screenshot:
@@ -115,41 +117,76 @@ To connect to WeChat Work, in addition to the prerequisites above, you also need
   you're not familiar with this, please refer to the WeChat Work official developer
   documentation: https://developer.work.weixin.qq.com/
 
-### Configure Environment Variables
+### Modify the configuration file.
 
-Since connecting to instant messaging tools requires configuring many environment variables, AilingBot provides a
-template file: .env.example, which can be copied and renamed to .env. Its contents are as follows:
+Open settings.toml, the complete content is as follows:
 
-```text
-AILINGBOT_LANG="zh_CN"
-AILINGBOT_TZ="Asia/Shanghai"
+```toml
+# This is the AilingBot configuration file template. Please modify it as needed.
 
-AILINGBOT_BROKER__NAME="pika"
-AILINGBOT_BROKER__ARGS="{'host'='localhost'}"
+lang = "zh_CN"
+tz = "Asia/Shanghai"
 
-AILINGBOT_POLICY__NAME="lc_conversation_chain"
-AILINGBOT_POLICY__ARGS="{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
+[broker]
+name = "pika"
 
-AILINGBOT_CHANNEL__AGENT__NAME="wechatwork"
-AILINGBOT_CHANNEL__AGENT__ARGS="{corpid='Your WechatWork corp id here',corpsecret='Your WechatWork corp secret here',agentid=0}"
-AILINGBOT_CHANNEL__WEBHOOK__NAME="wechatwork"
-AILINGBOT_CHANNEL__WEBHOOK__ARGS="{token='Your WechatWork webhook token here',aes_key='Your WechatWork webhook AES key here'}"
-AILINGBOT_CHANNEL__UVICORN__ARGS="{host='0.0.0.0',port='8080'}"
+[broker.args]
+host = "localhost"
+
+[policy]
+name = "lc_conversation_chain"
+# name = "lc_llm_chain"
+
+[policy.args]
+
+[policy.args.lc_chain_config]
+_type = "llm_chain"
+
+[policy.args.lc_chain_config.prompt]
+_type = "prompt"
+template = """Human: {input}
+
+AI:
+"""
+input_variables = ["input"]
+
+[policy.args.lc_chain_config.llm]
+_type = "openai"
+model_name = "gpt-3.5-turbo"
+openai_api_key = "Your OpenAI API key"
+temperature = 0
+
+[channel]
+
+[channel.agent]
+
+name = "wechatwork"
+
+[channel.agent.args]
+corpid = "WechatWork corpid"
+corpsecret = "WechatWork corpsecret"
+agentid = 0
+
+[channel.webhook]
+name = "wechatwork"
+
+[channel.webhook.args]
+token = "WechatWork webhook token"
+aes_key = "WechatWork webhook aes_key"
+
+[channel.uvicorn.args]
+host = "0.0.0.0"
+port = 8080
 ```
 
-The following information needs to be filled in as needed:
+Here are the places that need to be filled in as needed:
 
-- Fill in your OpenAI API key in the openai_api_key field of llm_args in AILINGBOT_POLICY__ARGS
-- Fill in the corresponding information of your WeChat Work app in corpid, corpsecret, and agentid in
-  AILINGBOT_CHANNEL__AGENT__ARGS
-- Fill in the Token and AES key in the configuration of the WeChat Work app's message receiving API in token and aes_key
-  in AILINGBOT_CHANNEL__WEBHOOK__ARGS.
-
-After completing the above modifications, run the following command to load the environment variables:
-
-```shell
-export $(grep -v '^#' .env | xargs)
-```
+- `openai_api_key = "Your OpenAI API key"`
+- `corpid = "WechatWork corpid"`
+- `corpsecret = "WechatWork corpsecret"`
+- `agentid = 0`
+- `token = "WechatWork webhook token"`
+- `aes_key = "WechatWork webhook aes_key"`
 
 ### Start the Bot
 
@@ -186,10 +223,6 @@ The webhook URL is: `http(s)://your_public_IP:8080/webhook/wechatwork/event/`
 After completing the above configuration, you can find the bot in WeChat Work and start a conversation:
 
 <img src="./img/wechatwork-screenshot.png" alt="WeChat Work Bot" width="400"/>
-
-# Architecture Overview
-
-![architecture](./img/architecture.png)
 
 # Roadmap
 

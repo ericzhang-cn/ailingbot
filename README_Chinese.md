@@ -33,16 +33,25 @@ AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。
 
 同时你需要有一个OpenAI API key。如果没有请到这里申请：https://platform.openai.com/account/api-keys
 
-### 设置环境变量（可选）
+### 修改配置文件
 
-AilingBot的开发哲学鼓励将配置放在环境变量中，当然你也可以跳过这一步，在后续启动命令时动态传入。
-
-设置环境变量命令：
+复制配置文件模板并重命名：
 
 ```shell
-export AILINGBOT_POLICY__NAME="lc_conversation_chain"
-export AILINGBOT_POLICY__ARGS="{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
+cp settings.example.toml settings.toml
 ```
+
+修改必要配置，启动机器人只需一项配置，找到settings.toml中以下部分：
+
+```toml
+[policy.args.lc_chain_config.llm]
+_type = "openai"
+model_name = "gpt-3.5-turbo"
+openai_api_key = "Your OpenAI API key"
+temperature = 0
+```
+
+将其中`openai_api_key`的值改为你的真实OpenAI API key。
 
 ### 启动机器人
 
@@ -79,16 +88,10 @@ Commands:
   channel  Channel commands.
 ```
 
-如果前面已经设置了环境变量，则可以通过如下命令启动机器人：
+通过如下命令启动机器人：
 
 ```shell
-ailingbot bot chat
-```
-
-如果没有设置环境变量，则需要通过启动参数传入必要信息：
-
-```shell
-ailingbot bot chat --policy lc_conversation_chain --policy-args "{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
+ailingbot bot chat -c settings.toml
 ```
 
 此时你可以通过一个交互式对话环境与机器人进行对话，如下图所示：
@@ -106,38 +109,76 @@ ailingbot bot chat --policy lc_conversation_chain --policy-args "{lc_chain_confi
 - 同时假设你已经有了一个可用的企业微信应用，并熟悉企业微信应用开发流程。如果对这块不熟悉，请参考企业微信官方开发者文档：
   https://developer.work.weixin.qq.com/
 
-### 配置环境变量
+### 修改配置文件
 
-由于接入即时通讯工具需要配置的环境变量较多，AilingBot提供了一个模板文件：.env.example，可以将其复制并重命名为.env。其内容如下：
+打开settings.toml，其完整内容如下：
 
-```text
-AILINGBOT_LANG="zh_CN"
-AILINGBOT_TZ="Asia/Shanghai"
+```toml
+# This is the AilingBot configuration file template. Please modify it as needed.
 
-AILINGBOT_BROKER__NAME="pika"
-AILINGBOT_BROKER__ARGS="{'host'='localhost'}"
+lang = "zh_CN"
+tz = "Asia/Shanghai"
 
-AILINGBOT_POLICY__NAME="lc_conversation_chain"
-AILINGBOT_POLICY__ARGS="{lc_chain_config={_type='llm_chain',prompt={_type='prompt',template='{question}',input_variables=['question']},llm={_type='openai',model_name='gpt-3.5-turbo',openai_api_key='Your OpenAI API key here',temperature=0}}}"
+[broker]
+name = "pika"
 
-AILINGBOT_CHANNEL__AGENT__NAME="wechatwork"
-AILINGBOT_CHANNEL__AGENT__ARGS="{corpid='Your WechatWork corp id here',corpsecret='Your WechatWork corp secret here',agentid=0}"
-AILINGBOT_CHANNEL__WEBHOOK__NAME="wechatwork"
-AILINGBOT_CHANNEL__WEBHOOK__ARGS="{token='Your WechatWork webhook token here',aes_key='Your WechatWork webhook AES key here'}"
-AILINGBOT_CHANNEL__UVICORN__ARGS="{host='0.0.0.0',port='8080'}"
+[broker.args]
+host = "localhost"
+
+[policy]
+name = "lc_conversation_chain"
+# name = "lc_llm_chain"
+
+[policy.args]
+
+[policy.args.lc_chain_config]
+_type = "llm_chain"
+
+[policy.args.lc_chain_config.prompt]
+_type = "prompt"
+template = """Human: {input}
+
+AI:
+"""
+input_variables = ["input"]
+
+[policy.args.lc_chain_config.llm]
+_type = "openai"
+model_name = "gpt-3.5-turbo"
+openai_api_key = "Your OpenAI API key"
+temperature = 0
+
+[channel]
+
+[channel.agent]
+
+name = "wechatwork"
+
+[channel.agent.args]
+corpid = "WechatWork corpid"
+corpsecret = "WechatWork corpsecret"
+agentid = 0
+
+[channel.webhook]
+name = "wechatwork"
+
+[channel.webhook.args]
+token = "WechatWork webhook token"
+aes_key = "WechatWork webhook aes_key"
+
+[channel.uvicorn.args]
+host = "0.0.0.0"
+port = 8080
 ```
 
 这里有如下地方需要按需填入：
 
-- AILINGBOT_POLICY__ARGS的llm_args的openai_api_key中填入你的OpenAI API key
-- AILINGBOT_CHANNEL__AGENT__ARGS的corpid、corpsecret和agentid需要填入你的企业微信应用的对应信息
-- AILINGBOT_CHANNEL__WEBHOOK__ARGS的token和aes_key需要填入你的企业微信应用接收消息API配置中的Token和AES key
-
-完成以上修改后，执行下述命令加载环境变量：
-
-```shell
-export $(grep -v '^#' .env | xargs)
-```
+- `openai_api_key = "Your OpenAI API key"`
+- `corpid = "WechatWork corpid"`
+- `corpsecret = "WechatWork corpsecret"`
+- `agentid = 0`
+- `token = "WechatWork webhook token"`
+- `aes_key = "WechatWork webhook aes_key"`
 
 ### 启动机器人
 
@@ -146,19 +187,19 @@ export $(grep -v '^#' .env | xargs)
 启动Channel Webhook进程，这个进程的作用是作为Webhook接收用户发送给企业微信应用的消息：
 
 ```shell
-ailingbot channel serve_webhook
+ailingbot channel serve_webhook -c settings.toml
 ```
 
 启动Bot Serve进程，这个进程的作用是监听通过Webhook接收到的用户消息，并按对应会话策略生成回复消息：
 
 ```shell
-ailingbot bot serve
+ailingbot bot serve -c settings.toml
 ```
 
 启动Channel Agent进程，这个进程的作用是将Bot Serve进程回复的消息发送给用户：
 
 ```shell
-ailingbot channel serve_agent
+ailingbot channel serve_agent -c settings.toml
 ```
 
 ### 配置Webhook
@@ -169,10 +210,6 @@ Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
 完成以上配置后，就可以在企业微信中找到机器人，进行对话了：
 
 <img src="./img/wechatwork-screenshot.png" alt="企业微信机器人" width="400"/>
-
-# 架构概览
-
-![architecture](./img/architecture.png)
 
 # 发展计划
 

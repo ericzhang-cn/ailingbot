@@ -89,6 +89,7 @@ def bot_group():
     help='Number of concurrently executed tasks.',
 )
 @click.option('--debug', is_flag=True, help='Enable debug mode.')
+@options.config_file_option
 @options.broker_name_option
 @options.broker_args_option
 @options.policy_name_option
@@ -96,14 +97,15 @@ def bot_group():
 @options.log_level_option
 @options.log_file_option
 def bot_serve(
-    number_of_tasks: int,
-    debug: bool,
-    broker: str,
-    broker_args: dict,
-    policy: str,
-    policy_args: dict,
-    log_level: str,
-    log_file: str,
+        number_of_tasks: int,
+        config_file: str,
+        debug: bool,
+        broker: str,
+        broker_args: dict,
+        policy: str,
+        policy_args: dict,
+        log_level: str,
+        log_file: str,
 ):
     """Run chatbot task(s) to serve request messages.
 
@@ -125,6 +127,9 @@ def bot_serve(
     :type log_file:
     """
     _set_logger(sink=log_file, level=log_level)
+
+    if config_file:
+        settings.load_file(config_file)
 
     if broker:
         settings.set('broker.name', broker)
@@ -166,17 +171,21 @@ def bot_serve(
 @bot_group.command(
     name='chat', help='Start an interactive bot conversation environment.'
 )
+@options.config_file_option
 @options.policy_name_option
 @options.policy_args_option
 @click.option('--debug', is_flag=True, help='Enable debug mode.')
 @_coro_cmd
 async def bot_chat(
-    policy: str,
-    policy_args: dict,
-    debug: bool,
+        config_file: str,
+        policy: str,
+        policy_args: dict,
+        debug: bool,
 ):
     """Start an interactive bot conversation environment.
 
+    :param config_file:
+    :type config_file:
     :param policy:
     :type policy:
     :param policy_args:
@@ -184,6 +193,9 @@ async def bot_chat(
     :param debug: Whether to enable debug mode.
     :type debug: bool
     """
+    if config_file:
+        settings.load_file(config_file)
+
     if policy:
         settings.set('policy.name', policy)
     if policy_args:
@@ -293,6 +305,7 @@ def channel_group():
     type=click.IntRange(min=1),
     help='Number of concurrently executed tasks.',
 )
+@options.config_file_option
 @options.channel_agent_name_option
 @options.channel_agent_args_option
 @options.broker_name_option
@@ -300,13 +313,14 @@ def channel_group():
 @options.log_level_option
 @options.log_file_option
 def channel_serve_agent(
-    number_of_tasks: int,
-    channel_agent: str,
-    channel_agent_args: dict,
-    broker: str,
-    broker_args: dict,
-    log_level: str,
-    log_file: str,
+        number_of_tasks: int,
+        config_file: str,
+        channel_agent: str,
+        channel_agent_args: dict,
+        broker: str,
+        broker_args: dict,
+        log_level: str,
+        log_file: str,
 ):
     """Run channel agent task(s) to serve response messages.
 
@@ -326,6 +340,9 @@ def channel_serve_agent(
     :type log_file:
     """
     _set_logger(sink=log_file, level=log_level)
+
+    if config_file:
+        settings.load_file(config_file)
 
     if channel_agent:
         settings.set('channel.agent.name', channel_agent)
@@ -365,6 +382,7 @@ def channel_serve_agent(
 @channel_group.command(
     name='serve_webhook', help='Run webhook server to receive events.'
 )
+@options.config_file_option
 @options.channel_webhook_name_option
 @options.channel_webhook_args_option
 @options.broker_name_option
@@ -374,15 +392,19 @@ def channel_serve_agent(
 @options.log_file_option
 @_coro_cmd
 async def channel_serve_webhook(
-    channel_webhook: str,
-    channel_webhook_args: dict,
-    broker: str,
-    broker_args: dict,
-    channel_uvicorn_args: dict,
-    log_level: str,
-    log_file: str,
+        config_file: str,
+        channel_webhook: str,
+        channel_webhook_args: dict,
+        broker: str,
+        broker_args: dict,
+        channel_uvicorn_args: dict,
+        log_level: str,
+        log_file: str,
 ):
     _set_logger(sink=log_file, level=log_level)
+
+    if config_file:
+        settings.load_file(config_file)
 
     if channel_webhook:
         settings.set('channel.webhook.name', channel_webhook)
