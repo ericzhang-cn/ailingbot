@@ -3,6 +3,8 @@
 ---
 
 ![Python package workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/python-package.yml/badge.svg)
+![Pylint workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/pylint.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 <img src="./img/logo.png" alt="logo" width="50"/>
 
@@ -13,11 +15,13 @@ AilingBot - An all-in-one solution to empower your IM bot with AI.
 - 💯**Open source&Free**: Completely open source and free.
 - 📦**Out of the box**: No development is required, with pre-built capabilities to integrate with mainstream IM and LLM
   models.
-- 🔗**Integrated LangChain**: The ability to integrate LangChain allows for the direct use of LangChain's pre-existing chains or agents.
+- 🔗**Integrated LangChain**: The ability to integrate LangChain allows for the direct use of LangChain's pre-existing
+  chains or agents.
 - 🧩**Modular**: The project is organized in a modular way, with modules depending on abstract protocols, and similar
   modules
   implementing the protocols for plug-and-play functionality.
-- 💻**Extensible**: It can expand the usage scenarios and capabilities of AilingBot. For example, integrating with new instant messaging platforms, new language learning models, or developing their own chains, agents, and chat policy.
+- 💻**Extensible**: It can expand the usage scenarios and capabilities of AilingBot. For example, integrating with new
+  instant messaging platforms, new language learning models, or developing their own chains, agents, and chat policy.
 - 🚀**High Performance**: AilingBot uses coroutine-based asynchronous mode to improve the system's high-concurrency
   performance. Meanwhile, the core servers can start multiple processes to further improve the system's high-concurrency
   processing capabilities.
@@ -46,7 +50,8 @@ Copy the configuration file template and rename it:
 cp settings.example.toml settings.toml
 ```
 
-Modify the necessary configuration and start the bot with only one configuration item. Find the following section in settings.toml:
+Modify the necessary configuration and start the bot with only one configuration item. Find the following section in
+settings.toml:
 
 ```toml
 [policy.args.lc_chain_config.llm]
