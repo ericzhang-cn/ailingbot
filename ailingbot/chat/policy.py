@@ -39,7 +39,7 @@ class ChatPolicy(AbstractAsyncComponent, abc.ABC):
         :return: Policy instance.
         :rtype: ChatPolicy
         """
-        if name.lower() == 'lc_chain':
+        if name.lower() == 'lc_llm_chain':
             from ailingbot.chat.policies.langchain import LCChainChatPolicy
             instance = LCChainChatPolicy(debug=debug, **kwargs)
         elif name.lower() == 'lc_conversation_chain':

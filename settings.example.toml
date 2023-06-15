@@ -1,0 +1,55 @@
+# This is the AilingBot configuration file template. Please modify it as needed.
+
+lang = "zh_CN"
+tz = "Asia/Shanghai"
+
+[broker]
+name = "pika"
+
+[broker.args]
+host = "localhost"
+
+[policy]
+name = "lc_conversation_chain"
+# name = "lc_llm_chain"
+
+[policy.args]
+
+[policy.args.lc_chain_config]
+_type = "llm_chain"
+
+[policy.args.lc_chain_config.prompt]
+_type = "prompt"
+template = """Human: {input}
+
+AI:
+"""
+input_variables = ["input"]
+
+[policy.args.lc_chain_config.llm]
+_type = "openai"
+model_name = "gpt-3.5-turbo"
+openai_api_key = "Your OpenAI API key"
+temperature = 0
+
+[channel]
+
+[channel.agent]
+
+name = "wechatwork"
+
+[channel.agent.args]
+corpid = "WechatWork corpid"
+corpsecret = "WechatWork corpsecret"
+agentid = 0
+
+[channel.webhook]
+name = "wechatwork"
+
+[channel.webhook.args]
+token = "WechatWork webhook token"
+aes_key = "WechatWork webhook aes_key"
+
+[channel.uvicorn.args]
+host = "0.0.0.0"
+port = 8080
