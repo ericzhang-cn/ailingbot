@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import os.path
 import sys
 import typing
 import uuid
@@ -13,6 +14,7 @@ from dynaconf import ValidationError
 from loguru import logger
 from prompt_toolkit import PromptSession
 from prompt_toolkit.formatted_text import FormattedText
+from rich.console import Console
 
 import ailingbot.shared.errors
 from ailingbot.channels.channel import ChannelAgent, ChannelWebhookFactory
@@ -22,10 +24,10 @@ from ailingbot.chat.messages import (
     FallbackResponseMessage,
     OptionsResponseMessage,
     InputRequestMessage,
-    InputResponseMessage,
+    InputResponseMessage, MessageScope,
 )
 from ailingbot.cli import options
-from ailingbot.cli.render import render
+from ailingbot.cli.render import render, display_radio_prompt
 from ailingbot.config import settings, validators
 
 
@@ -111,6 +113,8 @@ def bot_serve(
 
     :param number_of_tasks: Number of concurrently executed tasks.
     :type number_of_tasks: int
+    :param config_file:
+    :type config_file:
     :param debug: Whether to enable debug mode.
     :type debug: bool
     :param broker:
@@ -251,7 +255,10 @@ async def bot_chat(
                 continue
             if input_ == 'exit':
                 break
-            request = TextRequestMessage(text=input_)
+            request = TextRequestMessage(
+                text=input_,
+                scope=MessageScope.USER,
+            )
 
         # Sends request and processes different types response.
         try:
@@ -326,6 +333,8 @@ def channel_serve_agent(
 
     :param number_of_tasks: Number of concurrently executed tasks.
     :type number_of_tasks: int
+    :param config_file:
+    :type config_file:
     :param channel_agent: Channel name.
     :type channel_agent: str
     :param channel_agent_args: Channel arguments.
@@ -441,6 +450,203 @@ async def channel_serve_webhook(
     config = uvicorn.Config(app=webhook, **settings.channel.uvicorn.args)
     server = uvicorn.Server(config)
     await server.serve()
+
+
+@command_line_tools.group(name='config', help='Configuration commands.')
+def config_group():
+    """Configuration commands."""
+    pass
+
+
+@config_group.command(
+    name='show', help='Show current configuration information.'
+)
+@options.config_file_option
+@click.option(
+    '-k',
+    '--config-key',
+    type=click.STRING,
+    help='Configuration key.',
+)
+def config_show(
+        config_file: str,
+        config_key: str,
+):
+    if config_file:
+        settings.load_file(config_file)
+
+    console = Console()
+    if config_key is None:
+        console.print(settings.as_dict())
+    else:
+        try:
+            console.print(settings[config_key].to_dict())
+        except AttributeError:
+            console.print(settings[config_key])
+        except KeyError:
+            console.print(None)
+
+
+@command_line_tools.command(name='init', help='Initialize the AilingBot environment.')
+@click.option('--silence', is_flag=True, help='Not asking for information and using a default configuration template.')
+@_coro_cmd
+async def init(silence: bool):
+    """Initialize the AilingBot environment."""
+    if silence:
+        file_path = os.path.join('.', 'settings.toml')
+        if os.path.exists(file_path):
+            click.echo(
+                click.style(
+                    text=f'Configuration file {file_path} already exists.',
+                    fg='yellow',
+                )
+            )
+            raise click.Abort()
+        else:
+            with open(file_path, 'w') as f:
+                content = """# This is the AilingBot configuration file template. Please modify it as needed.
+
+lang = "zh_CN"
+tz = "Asia/Shanghai"
+
+[broker]
+name = "pika"
+
+[broker.args]
+host = "localhost"
+
+[policy]
+name = "lc_conversation_chain"
+# name = "lc_llm_chain"
+
+[policy.args]
+
+[policy.args.lc_chain_config]
+_type = "llm_chain"
+
+[policy.args.lc_chain_config.prompt]
+_type = "prompt"
+template = \"\"\"Human: {{input}}
+
+AI:
+\"\"\"
+input_variables = ["input"]
+
+[policy.args.lc_chain_config.llm]
+_type = "openai"
+model_name = "gpt-3.5-turbo"
+openai_api_key = "Your OpenAI API key"
+temperature = 0
+
+[channel]
+
+[channel.agent]
+
+name = "wechatwork"
+
+[channel.agent.args]
+corpid = "WechatWork corpid"
+corpsecret = "WechatWork corpsecret"
+agentid = 0
+
+[channel.webhook]
+name = "wechatwork"
+
+[channel.webhook.args]
+token = "WechatWork webhook token"
+aes_key = "WechatWork webhook aes_key"
+
+[channel.uvicorn.args]
+host = "0.0.0.0"
+port = 8080
+"""
+                f.write(content)
+            click.echo(
+                click.style(
+                    text=f'Configuration file {file_path} has been created.',
+                    fg='green',
+                )
+            )
+    else:
+        session = PromptSession()
+
+        file_path = await session.prompt_async(
+            FormattedText([('skyblue', 'Enter the configuration file: ')]),
+            default=os.path.join('.', 'settings.toml'),
+        )
+        if os.path.exists(file_path):
+            click.echo(
+                click.style(
+                    text=f'Configuration file {file_path} already exists.',
+                    fg='yellow',
+                )
+            )
+            raise click.Abort()
+
+        policy = await display_radio_prompt(
+            title='Select chat policy:',
+            values=[(x, x) for x in ['lc_llm_chain', 'lc_conversation_chain', 'Configure Later']],
+            cancel_value='Configure Later',
+        )
+        if policy == 'Configure Later':
+            policy = 'Input policy name here'
+
+        broker = await display_radio_prompt(
+            title='Select broker:',
+            values=[(x, x) for x in ['pika', 'kafka', 'Configure Later']],
+            cancel_value='Configure Later',
+        )
+        if broker == 'Configure Later':
+            broker = 'Input broker name here'
+
+        channel = await display_radio_prompt(
+            title='Select channel:',
+            values=[(x, x) for x in ['wechatwork', 'lark', 'dingtalk', 'slack', 'Configure Later']],
+            cancel_value='Configure Later',
+        )
+        if channel == 'Configure Later':
+            channel = 'Input channel name here'
+
+        content = f"""# This is the AilingBot configuration file template. Please modify it as needed.
+
+lang = "zh_CN"
+tz = "Asia/Shanghai"
+
+[broker]
+name = "{broker}"
+
+[broker.args]
+
+[policy]
+name = "{policy}"
+
+[policy.args]
+
+[channel]
+
+[channel.agent]
+
+name = "{channel}"
+
+[channel.agent.args]
+
+[channel.webhook]
+name = "{channel}"
+
+[channel.webhook.args]
+
+[channel.uvicorn.args]
+host = "0.0.0.0"
+port = 8080
+"""
+        with open(file_path, 'w') as f:
+            f.write(content)
+        click.echo(
+            click.style(
+                text=f'Configuration file {file_path} has been created.',
+                fg='green',
+            )
+        )
 
 
 if __name__ == '__main__':

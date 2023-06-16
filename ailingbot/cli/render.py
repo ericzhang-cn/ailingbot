@@ -5,7 +5,7 @@ import typing
 
 import click
 from prompt_toolkit import Application
-from prompt_toolkit.formatted_text import AnyFormattedText
+from prompt_toolkit.formatted_text import AnyFormattedText, FormattedText
 from prompt_toolkit.key_binding import KeyBindings, merge_key_bindings
 from prompt_toolkit.key_binding.defaults import load_key_bindings
 from prompt_toolkit.layout import Layout, HSplit
@@ -24,11 +24,11 @@ from ailingbot.chat.messages import (
 
 
 async def display_input_prompt(
-    *,
-    title: str = '',
-    visible: bool = True,
-    required: bool = True,
-    cancel_value: typing.Any = None,
+        *,
+        title: str = '',
+        visible: bool = True,
+        required: bool = True,
+        cancel_value: typing.Any = None,
 ) -> typing.Optional[str]:
     text_area = TextArea(password=not visible)
 
@@ -60,10 +60,10 @@ async def display_input_prompt(
 
 
 async def display_radio_prompt(
-    *,
-    title: str = '',
-    values: typing.Optional[list[tuple[typing.Any, AnyFormattedText]]] = None,
-    cancel_value: typing.Any = None,
+        *,
+        title: str = '',
+        values: typing.Optional[list[tuple[typing.Any, AnyFormattedText]]] = None,
+        cancel_value: typing.Any = None,
 ) -> typing.Any:
     """Displays radio boxes for users to select.
 
@@ -93,7 +93,7 @@ async def display_radio_prompt(
         event.app.exit(result=cancel_value)
 
     application = Application(
-        layout=Layout(HSplit([Label(title), radio_list])),
+        layout=Layout(HSplit([Label(FormattedText([('skyblue', title)])), radio_list])),
         key_bindings=merge_key_bindings([load_key_bindings(), bindings]),
         mouse_support=True,
         full_screen=False,
