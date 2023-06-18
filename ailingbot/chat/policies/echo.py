@@ -15,14 +15,14 @@ class EchoChatPolicy(ChatPolicy):
     """Return message to the user with context, for testing purposes only."""
 
     def __init__(
-            self,
-            *,
-            debug: bool = False,
+        self,
+        *,
+        debug: bool = False,
     ):
         super(EchoChatPolicy, self).__init__(debug=debug)
 
     async def respond(
-            self, *, conversation_id: str, message: RequestMessage
+        self, *, conversation_id: str, message: RequestMessage
     ) -> ResponseMessage:
         if not isinstance(message, TextRequestMessage):
             response = FallbackResponseMessage()

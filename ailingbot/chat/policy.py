@@ -17,7 +17,7 @@ class ChatPolicy(AbstractAsyncComponent, abc.ABC):
 
     @abc.abstractmethod
     async def respond(
-            self, *, conversation_id: str, message: RequestMessage
+        self, *, conversation_id: str, message: RequestMessage
     ) -> ResponseMessage:
         """Responding to user inputs.
 
@@ -41,12 +41,15 @@ class ChatPolicy(AbstractAsyncComponent, abc.ABC):
         """
         if name.lower() == 'echo':
             from ailingbot.chat.policies.echo import EchoChatPolicy
+
             instance = EchoChatPolicy(debug=debug)
         elif name.lower() == 'lc_llm_chain':
             from ailingbot.chat.policies.langchain import LCChainChatPolicy
+
             instance = LCChainChatPolicy(debug=debug, **kwargs)
         elif name.lower() == 'lc_conversation_chain':
             from ailingbot.chat.policies.langchain import LCConversationChain
+
             instance = LCConversationChain(debug=debug, **kwargs)
         else:
             instance = get_class_dynamically(name)(debug=debug, **kwargs)

@@ -20,10 +20,10 @@ class LCChainChatPolicy(ChatPolicy):
     """Load LangChain chain and use the chain as chat policy"""
 
     def __init__(
-            self,
-            *,
-            debug: bool = False,
-            lc_chain_config: dict,
+        self,
+        *,
+        debug: bool = False,
+        lc_chain_config: dict,
     ):
         super(LCChainChatPolicy, self).__init__(debug=debug)
 
@@ -37,7 +37,7 @@ class LCChainChatPolicy(ChatPolicy):
         return load_chain_from_config(self.lc_chain_config)
 
     async def respond(
-            self, *, conversation_id: str, message: RequestMessage
+        self, *, conversation_id: str, message: RequestMessage
     ) -> ResponseMessage:
         if not isinstance(message, TextRequestMessage):
             response = FallbackResponseMessage()
@@ -59,12 +59,14 @@ class LCChainChatPolicy(ChatPolicy):
 
 class LCConversationChain(LCChainChatPolicy):
     def __init__(
-            self,
-            *,
-            debug: bool = False,
-            lc_chain_config: dict,
+        self,
+        *,
+        debug: bool = False,
+        lc_chain_config: dict,
     ):
-        super(LCConversationChain, self).__init__(debug=debug, lc_chain_config=lc_chain_config)
+        super(LCConversationChain, self).__init__(
+            debug=debug, lc_chain_config=lc_chain_config
+        )
 
     async def _load_chain(self) -> Chain:
         if self.debug:

@@ -6,7 +6,7 @@
 ![Pylint workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/pylint.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-<img src="./img/logo.png" alt="logo" width="50"/>
+<img src="./img/logo.png" alt="logo" width="50" height="50"/>
 
 AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。
 
@@ -35,15 +35,16 @@ AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。
 
 同时你需要有一个OpenAI API key。如果没有请到这里申请：https://platform.openai.com/account/api-keys
 
-### 修改配置文件
-
-复制配置文件模板并重命名：
+### 初始化配置文件
 
 ```shell
-cp settings.example.toml settings.toml
+poetry install
+poetry shell
+ailingbot init --silence
 ```
 
-修改必要配置，启动机器人只需一项配置，找到settings.toml中以下部分：
+此时在当前目录会创建一个叫settings.toml的文件，这个文件就是AilingBot的配置文件。 
+接下来修改必要配置，启动机器人只需一项配置，找到settings.toml中以下部分：
 
 ```toml
 [policy.args.lc_chain_config.llm]
@@ -56,39 +57,6 @@ temperature = 0
 将其中`openai_api_key`的值改为你的真实OpenAI API key。
 
 ### 启动机器人
-
-在AilingBot根目录下，首先安装依赖：
-
-```shell
-poetry install
-```
-
-然后进入virtualenv环境：
-
-```shell
-poetry shell
-```
-
-执行以下命令：
-
-```shell
-ailingbot --help
-```
-
-如果能看到以下输出，则说明AilingBot安装成功：
-
-```text
-Usage: ailingbot [OPTIONS] COMMAND [ARGS]...
-
-  AilingBot command line tools.
-
-Options:
-  --help  Show this message and exit.
-
-Commands:
-  bot      Bot commands.
-  channel  Channel commands.
-```
 
 通过如下命令启动机器人：
 
@@ -126,23 +94,16 @@ name = "pika"
 
 [broker.args]
 host = "localhost"
+port = 5672
+user = ""
+password = ""
+timeout = 5
+queue_name_prefix = ""
 
 [policy]
 name = "lc_conversation_chain"
-# name = "lc_llm_chain"
 
 [policy.args]
-
-[policy.args.lc_chain_config]
-_type = "llm_chain"
-
-[policy.args.lc_chain_config.prompt]
-_type = "prompt"
-template = """Human: {input}
-
-AI:
-"""
-input_variables = ["input"]
 
 [policy.args.lc_chain_config.llm]
 _type = "openai"
@@ -153,7 +114,6 @@ temperature = 0
 [channel]
 
 [channel.agent]
-
 name = "wechatwork"
 
 [channel.agent.args]
@@ -173,7 +133,7 @@ host = "0.0.0.0"
 port = 8080
 ```
 
-这里有如下地方需要按需填入：
+这里有如下地方需要填入你的真实配置内容：
 
 - `openai_api_key = "Your OpenAI API key"`
 - `corpid = "WechatWork corpid"`

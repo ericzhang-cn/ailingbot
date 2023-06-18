@@ -24,9 +24,10 @@ from ailingbot.chat.messages import (
     FallbackResponseMessage,
     OptionsResponseMessage,
     InputRequestMessage,
-    InputResponseMessage, MessageScope,
+    InputResponseMessage,
+    MessageScope,
 )
-from ailingbot.cli import options
+from ailingbot.cli import options, setting
 from ailingbot.cli.render import render, display_radio_prompt
 from ailingbot.config import settings, validators
 
@@ -99,15 +100,15 @@ def bot_group():
 @options.log_level_option
 @options.log_file_option
 def bot_serve(
-        number_of_tasks: int,
-        config_file: str,
-        debug: bool,
-        broker: str,
-        broker_args: dict,
-        policy: str,
-        policy_args: dict,
-        log_level: str,
-        log_file: str,
+    number_of_tasks: int,
+    config_file: str,
+    debug: bool,
+    broker: str,
+    broker_args: dict,
+    policy: str,
+    policy_args: dict,
+    log_level: str,
+    log_file: str,
 ):
     """Run chatbot task(s) to serve request messages.
 
@@ -181,10 +182,10 @@ def bot_serve(
 @click.option('--debug', is_flag=True, help='Enable debug mode.')
 @_coro_cmd
 async def bot_chat(
-        config_file: str,
-        policy: str,
-        policy_args: dict,
-        debug: bool,
+    config_file: str,
+    policy: str,
+    policy_args: dict,
+    debug: bool,
 ):
     """Start an interactive bot conversation environment.
 
@@ -320,14 +321,14 @@ def channel_group():
 @options.log_level_option
 @options.log_file_option
 def channel_serve_agent(
-        number_of_tasks: int,
-        config_file: str,
-        channel_agent: str,
-        channel_agent_args: dict,
-        broker: str,
-        broker_args: dict,
-        log_level: str,
-        log_file: str,
+    number_of_tasks: int,
+    config_file: str,
+    channel_agent: str,
+    channel_agent_args: dict,
+    broker: str,
+    broker_args: dict,
+    log_level: str,
+    log_file: str,
 ):
     """Run channel agent task(s) to serve response messages.
 
@@ -401,14 +402,14 @@ def channel_serve_agent(
 @options.log_file_option
 @_coro_cmd
 async def channel_serve_webhook(
-        config_file: str,
-        channel_webhook: str,
-        channel_webhook_args: dict,
-        broker: str,
-        broker_args: dict,
-        channel_uvicorn_args: dict,
-        log_level: str,
-        log_file: str,
+    config_file: str,
+    channel_webhook: str,
+    channel_webhook_args: dict,
+    broker: str,
+    broker_args: dict,
+    channel_uvicorn_args: dict,
+    log_level: str,
+    log_file: str,
 ):
     _set_logger(sink=log_file, level=log_level)
 
@@ -469,8 +470,8 @@ def config_group():
     help='Configuration key.',
 )
 def config_show(
-        config_file: str,
-        config_key: str,
+    config_file: str,
+    config_key: str,
 ):
     if config_file:
         settings.load_file(config_file)
@@ -487,93 +488,53 @@ def config_show(
             console.print(None)
 
 
-@command_line_tools.command(name='init', help='Initialize the AilingBot environment.')
-@click.option('--silence', is_flag=True, help='Not asking for information and using a default configuration template.')
+@command_line_tools.command(
+    name='init', help='Initialize the AilingBot environment.'
+)
+@click.option('--silence', is_flag=True, help='Without asking the user.')
+@click.option(
+    '--overwrite',
+    is_flag=True,
+    help='Overwrite existing file if a file with the same name already exists.',
+)
 @_coro_cmd
-async def init(silence: bool):
+async def init(silence: bool, overwrite: bool):
     """Initialize the AilingBot environment."""
     if silence:
         file_path = os.path.join('.', 'settings.toml')
-        if os.path.exists(file_path):
-            click.echo(
-                click.style(
-                    text=f'Configuration file {file_path} already exists.',
-                    fg='yellow',
-                )
-            )
-            raise click.Abort()
-        else:
-            with open(file_path, 'w') as f:
-                content = """# This is the AilingBot configuration file template. Please modify it as needed.
-
-lang = "zh_CN"
-tz = "Asia/Shanghai"
-
-[broker]
-name = "pika"
-
-[broker.args]
-host = "localhost"
-
-[policy]
-name = "lc_conversation_chain"
-# name = "lc_llm_chain"
-
-[policy.args]
-
-[policy.args.lc_chain_config]
-_type = "llm_chain"
-
-[policy.args.lc_chain_config.prompt]
-_type = "prompt"
-template = \"\"\"Human: {{input}}
-
-AI:
-\"\"\"
-input_variables = ["input"]
-
-[policy.args.lc_chain_config.llm]
-_type = "openai"
-model_name = "gpt-3.5-turbo"
-openai_api_key = "Your OpenAI API key"
-temperature = 0
-
-[channel]
-
-[channel.agent]
-
-name = "wechatwork"
-
-[channel.agent.args]
-corpid = "WechatWork corpid"
-corpsecret = "WechatWork corpsecret"
-agentid = 0
-
-[channel.webhook]
-name = "wechatwork"
-
-[channel.webhook.args]
-token = "WechatWork webhook token"
-aes_key = "WechatWork webhook aes_key"
-
-[channel.uvicorn.args]
-host = "0.0.0.0"
-port = 8080
-"""
-                f.write(content)
-            click.echo(
-                click.style(
-                    text=f'Configuration file {file_path} has been created.',
-                    fg='green',
-                )
-            )
+        policy = 'lc_conversation_chain'
+        broker = 'pika'
+        channel = 'wechatwork'
     else:
         session = PromptSession()
-
         file_path = await session.prompt_async(
             FormattedText([('skyblue', 'Enter the configuration file: ')]),
             default=os.path.join('.', 'settings.toml'),
         )
+        policy = await display_radio_prompt(
+            title='Select chat policy:',
+            values=[
+                (x, x)
+                for x in [
+                    'lc_llm_chain',
+                    'lc_conversation_chain',
+                    'Configure Later',
+                ]
+            ],
+            cancel_value='Configure Later',
+        )
+        broker = await display_radio_prompt(
+            title='Select broker:',
+            values=[(x, x) for x in ['pika', 'Configure Later']],
+            cancel_value='Configure Later',
+        )
+        channel = await display_radio_prompt(
+            title='Select channel:',
+            values=[(x, x) for x in ['wechatwork', 'Configure Later']],
+            cancel_value='Configure Later',
+        )
+
+    if not overwrite:
         if os.path.exists(file_path):
             click.echo(
                 click.style(
@@ -583,70 +544,62 @@ port = 8080
             )
             raise click.Abort()
 
-        policy = await display_radio_prompt(
-            title='Select chat policy:',
-            values=[(x, x) for x in ['lc_llm_chain', 'lc_conversation_chain', 'Configure Later']],
-            cancel_value='Configure Later',
-        )
-        if policy == 'Configure Later':
-            policy = 'Input policy name here'
+    if policy == 'Configure Later':
+        policy_name = ''
+        policy_args = ''
+    else:
+        policy_name = policy
+        if policy == 'lc_llm_chain':
+            policy_args = setting.LC_LLM_CHAIN_POLICY_ARGS_SETTINGS
+        elif policy_name == 'lc_conversation_chain':
+            policy_args = setting.LC_CONVERSATION_CHAIN_POLICY_ARGS_SETTINGS
+        else:
+            policy_args = ''
 
-        broker = await display_radio_prompt(
-            title='Select broker:',
-            values=[(x, x) for x in ['pika', 'kafka', 'Configure Later']],
-            cancel_value='Configure Later',
-        )
-        if broker == 'Configure Later':
-            broker = 'Input broker name here'
+    if broker == 'Configure Later':
+        broker_name = ''
+        broker_args = ''
+    else:
+        broker_name = broker
+        if broker == 'pika':
+            broker_args = setting.PIKA_BROKER_ARGS_SETTINGS
+        else:
+            broker_args = ''
 
-        channel = await display_radio_prompt(
-            title='Select channel:',
-            values=[(x, x) for x in ['wechatwork', 'lark', 'dingtalk', 'slack', 'Configure Later']],
-            cancel_value='Configure Later',
-        )
-        if channel == 'Configure Later':
-            channel = 'Input channel name here'
-
-        content = f"""# This is the AilingBot configuration file template. Please modify it as needed.
-
-lang = "zh_CN"
-tz = "Asia/Shanghai"
-
-[broker]
-name = "{broker}"
-
-[broker.args]
-
-[policy]
-name = "{policy}"
-
-[policy.args]
-
-[channel]
-
-[channel.agent]
-
-name = "{channel}"
-
-[channel.agent.args]
-
-[channel.webhook]
-name = "{channel}"
-
-[channel.webhook.args]
-
-[channel.uvicorn.args]
-host = "0.0.0.0"
-port = 8080
-"""
-        with open(file_path, 'w') as f:
-            f.write(content)
-        click.echo(
-            click.style(
-                text=f'Configuration file {file_path} has been created.',
-                fg='green',
+    if channel == 'Configure Later':
+        channel_name = ''
+        channel_agent_args = ''
+        channel_webhook_args = ''
+    else:
+        channel_name = channel
+        if channel == 'wechatwork':
+            channel_agent_args = setting.WECHATWORK_CHANNEL_AGENT_ARGS_SETTINGS
+            channel_webhook_args = (
+                setting.WECHATWORK_CHANNEL_WEBHOOK_ARGS_SETTINGS
             )
+        else:
+            channel_agent_args = ''
+            channel_webhook_args = ''
+
+    content = setting.MAIN_SETTINGS.format(
+        broker_name,
+        broker_args,
+        policy_name,
+        policy_args,
+        channel_name,
+        channel_agent_args,
+        channel_name,
+        channel_webhook_args,
+    )
+
+    with open(file_path, 'w') as f:
+        f.write(content)
+    click.echo(
+        click.style(
+            text=f'Configuration file {file_path} has been created.',
+            fg='green',
         )
+    )
 
 
 if __name__ == '__main__':
