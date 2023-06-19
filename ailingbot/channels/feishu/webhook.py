@@ -5,18 +5,12 @@ import typing
 
 from asgiref.typing import ASGIApplication
 from fastapi import FastAPI, status, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from ailingbot.brokers.broker import MessageBroker
 from ailingbot.channels.channel import ChannelWebhookFactory
 from ailingbot.chat.messages import TextRequestMessage, MessageScope
 from ailingbot.config import settings
-
-
-class FeishuChallengeBody(BaseModel):
-    challenge: str
-    token: str
-    type: str
 
 
 class FeishuEventBodyHeader(BaseModel):
@@ -53,7 +47,10 @@ class FeishuEventBodyEvent(BaseModel):
 class FeishuEventBody(BaseModel):
     """The event body of Feishu message."""
 
-    schema: str
+    challenge: str
+    token: str
+    type: str
+    _schema: str = Field(alias='schema')
     header: FeishuEventBodyHeader
     event: FeishuEventBodyEvent
 
@@ -87,7 +84,7 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
             '/webhook/wechatwork/event/', status_code=status.HTTP_200_OK
         )
         async def handle_event(
-            event: FeishuEventBody | FeishuChallengeBody,
+            event: FeishuEventBody,
         ) -> dict:
             """Handle the event request from Feishu.
 
@@ -105,7 +102,7 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
                     'challenge': event.challenge,
                 }
 
-            if event.schema != '2.0':
+            if event._schema != '2.0':
                 raise HTTPException(
                     status_code=status.HTTP_406_NOT_ACCEPTABLE,
                     detail='Invalid schema.',
