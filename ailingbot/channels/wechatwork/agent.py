@@ -94,7 +94,12 @@ class WechatworkAgent(ChannelAgent):
 
     async def send_message(self, message: ResponseMessage) -> None:
         """Using Wechatwork agent to send message."""
-        content, message_type = await render(message)
+        try:
+            content, message_type = await render(message)
+        except NotImplementedError:
+            content, message_type = await render(
+                message.downgrade_to_text_message()
+            )
         body = {
             'msgtype': message_type,
             **content,

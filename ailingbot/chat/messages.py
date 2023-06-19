@@ -51,6 +51,21 @@ class ResponseMessage(BaseModel, abc.ABC):
     meta: dict = {}
     echo: dict = {}
 
+    def _downgrade(self) -> str:
+        return self.json(ensure_ascii=False)
+
+    def downgrade_to_text_message(self) -> TextResponseMessage:
+        """When the channel does not support rendering this type of message, how to downgrade it to a text message."""
+        return TextResponseMessage(
+            uuid=self.uuid,
+            ack_uuid=self.ack_uuid,
+            receiver_id=self.receiver_id,
+            scope=self.scope,
+            meta=self.meta,
+            echo=self.echo,
+            text=self._downgrade(),
+        )
+
 
 class ContentResponseMessage(ResponseMessage, abc.ABC):
     """Base class of response message that outputs content."""
@@ -61,13 +76,17 @@ class ContentResponseMessage(ResponseMessage, abc.ABC):
 class SilenceResponseMessage(ContentResponseMessage):
     """Response message that outputs nothing."""
 
-    pass
+    def _downgrade(self) -> str:
+        return ''
 
 
 class TextResponseMessage(ContentResponseMessage):
     """Plain text response message."""
 
     text: str = ''
+
+    def _downgrade(self) -> str:
+        return self.text
 
 
 class TabularResponseMessage(ContentResponseMessage):
@@ -87,6 +106,10 @@ class FallbackResponseMessage(ContentResponseMessage):
     reason: str = ''
     suggestion: str = ''
 
+    def _downgrade(self) -> str:
+        return f"""{self.reason}
+{self.suggestion}"""
+
 
 class FormResponseMessage(ResponseMessage, abc.ABC):
     """Base class of form response messages."""
@@ -103,6 +126,9 @@ class InputResponseMessage(FormResponseMessage):
     required: bool = True
     visible: bool = True
 
+    def _downgrade(self) -> str:
+        return self.title
+
 
 class Option(BaseModel):
     """Option for OptionsResponseMessage."""
@@ -118,3 +144,8 @@ class OptionsResponseMessage(FormResponseMessage):
     """
 
     options: list[Option] = []
+
+    def _downgrade(self) -> str:
+        nl = '\n'
+        return f"""{self.title}
+{nl.join([f'{x.text}[{str(x.value)}]' for x in self.options])}"""

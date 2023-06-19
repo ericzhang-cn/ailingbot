@@ -53,12 +53,6 @@ Suggestion: {response.suggestion}"""
 
 
 @render.register
-async def _render(response: TabularResponseMessage) -> tuple[dict, str]:
-    """Renders tabular response message."""
-    pass
-
-
-@render.register
 async def _render(response: InputResponseMessage) -> tuple[dict, str]:
     """Renders input prompt response message."""
     content = {
