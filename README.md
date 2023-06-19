@@ -25,9 +25,20 @@ AilingBot - An all-in-one solution to empower your IM bot with AI.
 - 🚀**High Performance**: AilingBot uses coroutine-based asynchronous mode to improve the system's high-concurrency
   performance. Meanwhile, the core servers can start multiple processes to further improve the system's high-concurrency
   processing capabilities.
-- 🔌**API**: AilingBot provides a clear set of endpoints as its API interface, facilitating integration and coordination
-  with
-  other systems and processes.
+- 🔌**Integrating through API**: AilingBot provides a set of clear API interfaces, which facilitates integration and
+  collaboration with other systems and processes.
+
+# IM support list
+
+## Supported
+
+- WeChat Work
+- Feishu
+
+## Coming soon
+
+- DingTalk
+- Slack
 
 # Quickstart Guide
 
@@ -50,9 +61,9 @@ poetry shell
 ailingbot init --silence
 ```
 
-This will create a file named settings.toml in the current directory, 
-which is the configuration file for AilingBot. Next, modify the necessary configurations. 
-To start the bot, you only need to configure one item. 
+This will create a file named settings.toml in the current directory,
+which is the configuration file for AilingBot. Next, modify the necessary configurations.
+To start the bot, you only need to configure one item.
 Find the following section in settings.toml:
 
 ```toml
@@ -193,7 +204,7 @@ After completing the above configuration, you can find the bot in WeChat Work an
 # Roadmap
 
 - [ ] Provide comprehensive user and developer documentation.
-- [ ] Support more IM platforms, such as DingTalk, Feishu, and Slack.
+- [ ] Support more IM platforms, such as DingTalk and Slack.
 - [ ] Support more commonly used LLM prompting paradigms and out-of-the-box chat policy.
 - [ ] Provide support for commonly used capabilities in LLM Chain, such as Vector Embedding&Query and Grounding.
 - [ ] Provide a WebUI.

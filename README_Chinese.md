@@ -19,8 +19,19 @@ AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。
 - 💻**可扩展**：可以扩展AilingBot的使用场景和能力。例如接入到新的IM，新的LLM，或者开发自己的Chain、Agent及对话策略
 - 🚀**高性能**：AilingBot采用基于协程的异步模式，提高系统的高并发性能。同时核心进程
   可以启动多进程，进一步提升系统的高并发处理能力
-- 🔌**API**：AilingBot提供一组清晰的Endpoint作为其API接口，方便与其他系统及
-  流程集成协同
+- 🔌**通过API集成**：AilingBot提供一组清晰的API接口，方便与其他系统及流程集成协同
+
+# IM支持列表
+
+## 已支持
+
+- 企业微信
+- 飞书
+
+## 即将支持
+
+- 钉钉
+- Slack
 
 # 快速使用指南
 
@@ -176,7 +187,7 @@ Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
 # 发展计划
 
 - [ ] 提供完善的使用文档和开发者文档
-- [ ] 支持更多的IM端，如钉钉、飞书、Slack等
+- [ ] 支持更多的IM端，如钉钉、Slack等
 - [ ] 支持更多常用LLM prompting范式和开箱即用的对话策略
 - [ ] 对LLM Chain中的常用能力，如对Vector Embedding&Query和Grounding提供支持
 - [ ] 提供WebUI
