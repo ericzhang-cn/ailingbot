@@ -14,34 +14,34 @@ from ailingbot.config import settings
 
 
 class FeishuEventBodyHeader(BaseModel):
-    event_id: str
-    event_type: str
-    create_time: str
-    token: str
-    app_id: str
-    tenant_key: str
+    event_id: typing.Optional[str]
+    event_type: typing.Optional[str]
+    create_time: typing.Optional[str]
+    token: typing.Optional[str]
+    app_id: typing.Optional[str]
+    tenant_key: typing.Optional[str]
 
 
 class FeishuEventBodyEventSender(BaseModel):
-    sender_id: dict[str, str]
-    sender_type: str
-    tenant_key: str
+    sender_id: typing.Optional[dict[str, str]]
+    sender_type: typing.Optional[str]
+    tenant_key: typing.Optional[str]
 
 
 class FeishuEventBodyEventMessage(BaseModel):
-    message_id: str
-    root_id: str
-    parent_id: str
-    create_time: str
-    chat_id: str
-    chat_type: str
-    message_type: str
-    content: str
+    message_id: typing.Optional[str]
+    root_id: typing.Optional[str]
+    parent_id: typing.Optional[str]
+    create_time: typing.Optional[str]
+    chat_id: typing.Optional[str]
+    chat_type: typing.Optional[str]
+    message_type: typing.Optional[str]
+    content: typing.Optional[str]
 
 
 class FeishuEventBodyEvent(BaseModel):
-    sender: FeishuEventBodyEventSender
-    message: FeishuEventBodyEventMessage
+    sender: typing.Optional[FeishuEventBodyEventSender]
+    message: typing.Optional[FeishuEventBodyEventMessage]
 
 
 class FeishuEventBody(BaseModel):
@@ -84,7 +84,7 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
             '/webhook/feishu/event/', status_code=status.HTTP_200_OK
         )
         async def handle_event(
-                event: FeishuEventBody,
+            event: FeishuEventBody,
         ) -> dict:
             """Handle the event request from Feishu.
 
