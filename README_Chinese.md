@@ -37,20 +37,17 @@ AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。
 
 ## 5分钟启动一个AI聊天机器人
 
-### 前置条件
+### 安装
 
-请确保你的机器上装有如下环境：
-
-- Python（>=3.9）：https://www.python.org/
-- Poetry：https://python-poetry.org/
+```shell
+pip install ailingbot
+```
 
 同时你需要有一个OpenAI API key。如果没有请到这里申请：https://platform.openai.com/account/api-keys
 
 ### 初始化配置文件
 
 ```shell
-poetry install
-poetry shell
 ailingbot init --silence
 ```
 

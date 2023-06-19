@@ -44,20 +44,18 @@ AilingBot - An all-in-one solution to empower your IM bot with AI.
 
 ## Launch an AI Chatbot in 5 Minutes
 
-### Prerequisites
+### Installation
 
-Please make sure you have the following environments installed on your machine:
+```shell
+pip install ailingbot
+```
 
-- Python (>=3.9): https://www.python.org/
-- Poetry: https://python-poetry.org/
 - You also need an OpenAI API key. If you don't have one, please apply for it
   here: https://platform.openai.com/account/api-keys
 
 ### Initialize Configuration File
 
 ```shell
-poetry install
-poetry shell
 ailingbot init --silence
 ```
 
