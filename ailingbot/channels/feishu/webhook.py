@@ -47,12 +47,12 @@ class FeishuEventBodyEvent(BaseModel):
 class FeishuEventBody(BaseModel):
     """The event body of Feishu message."""
 
-    challenge: str
-    token: str
-    type: str
-    _schema: str = Field(alias='schema')
-    header: FeishuEventBodyHeader
-    event: FeishuEventBodyEvent
+    challenge: typing.Optional[str]
+    token: typing.Optional[str]
+    type: typing.Optional[str]
+    _schema: typing.Optional[str] = Field(alias='schema')
+    header: typing.Optional[FeishuEventBodyHeader]
+    event: typing.Optional[FeishuEventBodyEvent]
 
 
 class FeishuWebhookFactory(ChannelWebhookFactory):
@@ -84,7 +84,7 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
             '/webhook/feishu/event/', status_code=status.HTTP_200_OK
         )
         async def handle_event(
-            event: FeishuEventBody,
+                event: FeishuEventBody,
         ) -> dict:
             """Handle the event request from Feishu.
 
