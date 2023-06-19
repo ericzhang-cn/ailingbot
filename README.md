@@ -6,7 +6,7 @@
 ![Pylint workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/pylint.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-<img src="./img/logo.png" alt="logo" width="50" height="50"/>
+<img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/logo.png" alt="logo" width="50" height="50"/>
 
 AilingBot - An all-in-one solution to empower your IM bot with AI.
 
@@ -50,8 +50,8 @@ AilingBot - An all-in-one solution to empower your IM bot with AI.
 pip install ailingbot
 ```
 
-- You also need an OpenAI API key. If you don't have one, please apply for it
-  here: https://platform.openai.com/account/api-keys
+You also need an OpenAI API key. If you don't have one, please apply for it
+here: https://platform.openai.com/account/api-keys
 
 ### Initialize Configuration File
 
@@ -83,7 +83,7 @@ ailingbot bot chat -c settings.toml
 ```
 
 You can now have a conversation with the bot through an interactive dialogue environment, as shown below:
-![Command-Line Screenshot](img/command-line-screenshot.png)
+![Command-Line Screenshot](https://github.com/ericzhang-cn/ailingbot/raw/main/img/command-line-screenshot.png)
 
 ## Connect to Instant Messaging Tools
 
@@ -197,7 +197,7 @@ The webhook URL is: `http(s)://your_public_IP:8080/webhook/wechatwork/event/`
 
 After completing the above configuration, you can find the bot in WeChat Work and start a conversation:
 
-<img src="./img/wechatwork-screenshot.png" alt="WeChat Work Bot" width="400"/>
+<img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/wechatwork-screenshot.png" alt="WeChat Work Bot" width="400"/>
 
 # Roadmap
 

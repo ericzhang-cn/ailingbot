@@ -6,7 +6,7 @@
 ![Pylint workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/pylint.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-<img src="./img/logo.png" alt="logo" width="50" height="50"/>
+<img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/logo.png" alt="logo" width="50" height="50"/>
 
 AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。
 
@@ -73,7 +73,7 @@ ailingbot bot chat -c settings.toml
 ```
 
 此时你可以通过一个交互式对话环境与机器人进行对话，如下图所示：
-![命令行机器人](img/command-line-screenshot.png)
+![命令行机器人](https://github.com/ericzhang-cn/ailingbot/raw/main/img/command-line-screenshot.png)
 
 ## 接入即时通讯工具
 
@@ -179,7 +179,7 @@ Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
 
 完成以上配置后，就可以在企业微信中找到机器人，进行对话了：
 
-<img src="./img/wechatwork-screenshot.png" alt="企业微信机器人" width="400"/>
+<img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/wechatwork-screenshot.png" alt="企业微信机器人" width="400"/>
 
 # 发展计划
 
