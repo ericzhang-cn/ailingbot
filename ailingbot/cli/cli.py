@@ -530,7 +530,9 @@ async def init(silence: bool, overwrite: bool):
         )
         channel = await display_radio_prompt(
             title='Select channel:',
-            values=[(x, x) for x in ['wechatwork', 'Configure Later']],
+            values=[
+                (x, x) for x in ['wechatwork', 'feishu', 'Configure Later']
+            ],
             cancel_value='Configure Later',
         )
 
