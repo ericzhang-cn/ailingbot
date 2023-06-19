@@ -577,6 +577,9 @@ async def init(silence: bool, overwrite: bool):
             channel_webhook_args = (
                 setting.WECHATWORK_CHANNEL_WEBHOOK_ARGS_SETTINGS
             )
+        elif channel == 'feishu':
+            channel_agent_args = setting.FEISHU_CHANNEL_AGENT_ARGS_SETTINGS
+            channel_webhook_args = setting.FEISHU_CHANNEL_WEBHOOK_ARGS_SETTINGS
         else:
             channel_agent_args = ''
             channel_webhook_args = ''

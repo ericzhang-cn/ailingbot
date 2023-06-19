@@ -7,6 +7,7 @@ from ailingbot.chat.messages import (
     TextRequestMessage,
     TextResponseMessage,
     FallbackResponseMessage,
+    TabularResponseMessage,
 )
 from ailingbot.chat.policy import ChatPolicy
 
@@ -28,14 +29,18 @@ class EchoChatPolicy(ChatPolicy):
             response = FallbackResponseMessage()
             response.reason = 'EchoChatPolicy can only handle messages of type TextRequestMessage.'
         else:
-            response = TextResponseMessage()
-            response.text = f"""Content: {message.text or ''}
-UUID: {message.uuid or ''}
-Sender ID: {message.sender_id or ''}
-Scope: {message.scope or ''}
-Meta: {json.dumps(message.meta) or ''}
-Echo: {json.dumps(message.echo) or ''}"""
+            response = TabularResponseMessage()
             response.uuid = str(uuid.uuid4())
+            response.title = response.uuid
+            response.headers = ['Field', 'Value']
+            response.data = [
+                ['UUID', message.uuid],
+                ['Sender', message.sender_id],
+                ['Scope', message.scope.name],
+                ['Meta', json.dumps(message.meta)],
+                ['Echo', json.dumps(message.echo)],
+                ['Text', message.text],
+            ]
             response.ack_uuid = message.uuid
             response.receiver_id = message.sender_id
             response.scope = message.scope

@@ -6,7 +6,6 @@ from ailingbot.chat.messages import (
     ResponseMessage,
     TextResponseMessage,
     FallbackResponseMessage,
-    TabularResponseMessage,
     InputResponseMessage,
     OptionsResponseMessage,
 )

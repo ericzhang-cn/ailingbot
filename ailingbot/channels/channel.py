@@ -65,6 +65,10 @@ class ChannelAgent(AbstractAsyncRunnable, abc.ABC):
             from ailingbot.channels.wechatwork.agent import WechatworkAgent
 
             instance = WechatworkAgent(num_of_tasks=num_of_tasks)
+        elif name.lower() == 'feishu':
+            from ailingbot.channels.feishu.agent import FeishuAgent
+
+            instance = FeishuAgent(num_of_tasks=num_of_tasks)
         else:
             instance = get_class_dynamically(name)(num_of_tasks=num_of_tasks)
 
@@ -100,6 +104,12 @@ class ChannelWebhookFactory(abc.ABC):
             )
 
             factory = WechatworkWebhookFactory()
+        elif name.lower() == 'feishu':
+            from ailingbot.channels.feishu.webhook import (
+                FeishuWebhookFactory,
+            )
+
+            factory = FeishuWebhookFactory()
         else:
             factory = get_class_dynamically(name)()
 

@@ -72,3 +72,10 @@ agentid = 0"""
 
 WECHATWORK_CHANNEL_WEBHOOK_ARGS_SETTINGS = """token = \"WechatWork webhook token\"
 aes_key = \"WechatWork webhook aes_key\""""
+
+FEISHU_CHANNEL_AGENT_ARGS_SETTINGS = """app_id = \"Feishu app_id\"
+app_secret = \"Feishu app_secret\""""
+
+FEISHU_CHANNEL_WEBHOOK_ARGS_SETTINGS = (
+    """verification_token = \"Feishu webhook verification_token\""""
+)

@@ -31,7 +31,7 @@ class WechatworkAgent(ChannelAgent):
         self.access_token: typing.Optional[str] = None
         self.expire_in: typing.Optional[arrow.Arrow] = None
 
-    async def get_access_token(self) -> str:
+    async def _get_access_token(self) -> str:
         """Gets Wechatwork API access token.
 
         Returns cached token if not expired, otherwise, refreshes token.
@@ -64,12 +64,12 @@ class WechatworkAgent(ChannelAgent):
         self.expire_in = arrow.now().shift(seconds=(expires_in - 120))
         return access_token
 
-    def clean_access_token(self) -> None:
+    def _clean_access_token(self) -> None:
         """Cleans up access token to force refreshing token."""
         self.access_token = None
         self.expire_in = None
 
-    async def send(self, *, body: dict[str, typing.Any]) -> None:
+    async def _send(self, *, body: dict[str, typing.Any]) -> None:
         """Sends message using Wechatwork API.
 
         :param body: Request body parameters.
@@ -79,7 +79,7 @@ class WechatworkAgent(ChannelAgent):
             'agentid': self.agentid,
             **body,
         }
-        access_token = await self.get_access_token()
+        access_token = await self._get_access_token()
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 'https://qyapi.weixin.qq.com/cgi-bin/message/send',
@@ -123,4 +123,4 @@ class WechatworkAgent(ChannelAgent):
                 else '|'.join(message.receiver_id)
             )
 
-        await self.send(body=body)
+        await self._send(body=body)
