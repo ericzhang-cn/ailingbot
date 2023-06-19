@@ -81,7 +81,7 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
             await self.broker.finalize()
 
         @self.app.post(
-            '/webhook/wechatwork/event/', status_code=status.HTTP_200_OK
+            '/webhook/feishu/event/', status_code=status.HTTP_200_OK
         )
         async def handle_event(
             event: FeishuEventBody,
