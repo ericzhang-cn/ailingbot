@@ -5,7 +5,7 @@ import typing
 
 from asgiref.typing import ASGIApplication
 from fastapi import FastAPI, status, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from ailingbot.brokers.broker import MessageBroker
 from ailingbot.channels.channel import ChannelWebhookFactory
@@ -50,7 +50,6 @@ class FeishuEventBody(BaseModel):
     challenge: typing.Optional[str]
     token: typing.Optional[str]
     type: typing.Optional[str]
-    _schema: typing.Optional[str] = Field(alias='schema')
     header: typing.Optional[FeishuEventBodyHeader]
     event: typing.Optional[FeishuEventBodyEvent]
 
@@ -102,11 +101,6 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
                         'challenge': event.challenge,
                     }
 
-            if event._schema != '2.0':
-                raise HTTPException(
-                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                    detail='Invalid schema.',
-                )
             if event.header.token != self.verification_token:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
