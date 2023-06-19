@@ -97,10 +97,10 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail='Invalid verification token.',
                     )
-            else:
-                return {
-                    'challenge': event.challenge,
-                }
+                else:
+                    return {
+                        'challenge': event.challenge,
+                    }
 
             if event._schema != '2.0':
                 raise HTTPException(
