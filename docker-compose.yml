@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  rabbit:
+    image: rabbitmq:3
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbit
+    restart: on-failure
+    command: poetry run ailingbot bot serve
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbit
+    restart: on-failure
+    command: poetry run ailingbot channel serve_agent
+  webhook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbit
+    restart: on-failure
+    command: poetry run ailingbot channel serve_webhook
