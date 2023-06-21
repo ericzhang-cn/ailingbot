@@ -93,7 +93,6 @@ class ChatBot(AbstractAsyncRunnable):
         try:
             request_message = await self.broker.consume_request()
         except ailingbot.shared.errors.EmptyQueueError:
-            logger.info(f'Task{number}: No more request message to process.')
             await asyncio.sleep(1)
             return
 

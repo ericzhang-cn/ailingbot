@@ -43,7 +43,6 @@ class ChannelAgent(AbstractAsyncRunnable, abc.ABC):
             response_message = await self.broker.consume_response()
             await self.send_message(response_message)
         except ailingbot.shared.errors.EmptyQueueError:
-            logger.info(f'Task{number}: No more response message to process.')
             await asyncio.sleep(1)
 
     async def _shutdown(self) -> None:

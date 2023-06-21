@@ -22,4 +22,4 @@ COPY ./ ./
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
 
 # Create settings.toml
-RUN ailingbot init --silence --overwrite
+RUN poetry run ailingbot init --silence --overwrite
