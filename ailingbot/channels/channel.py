@@ -35,7 +35,6 @@ class ChannelAgent(AbstractAsyncRunnable, abc.ABC):
     async def _startup(self) -> None:
         self.broker = MessageBroker.get_broker(
             settings.broker.name,
-            **settings.broker.args,
         )
         await self.broker.initialize()
 

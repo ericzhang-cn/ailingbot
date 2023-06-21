@@ -9,8 +9,8 @@ from functools import wraps
 
 import click
 import emoji
+import tomlkit
 import uvicorn
-from dynaconf import ValidationError
 from loguru import logger
 from prompt_toolkit import PromptSession
 from prompt_toolkit.formatted_text import FormattedText
@@ -27,9 +27,9 @@ from ailingbot.chat.messages import (
     InputResponseMessage,
     MessageScope,
 )
-from ailingbot.cli import options, setting
+from ailingbot.cli import options
 from ailingbot.cli.render import render, display_radio_prompt
-from ailingbot.config import settings, validators
+from ailingbot.config import settings
 
 
 def _coro_cmd(f: typing.Callable) -> typing.Callable:
@@ -92,21 +92,11 @@ def bot_group():
     help='Number of concurrently executed tasks.',
 )
 @click.option('--debug', is_flag=True, help='Enable debug mode.')
-@options.config_file_option
-@options.broker_name_option
-@options.broker_args_option
-@options.policy_name_option
-@options.policy_args_option
 @options.log_level_option
 @options.log_file_option
 def bot_serve(
     number_of_tasks: int,
-    config_file: str,
     debug: bool,
-    broker: str,
-    broker_args: dict,
-    policy: str,
-    policy_args: dict,
     log_level: str,
     log_file: str,
 ):
@@ -114,52 +104,14 @@ def bot_serve(
 
     :param number_of_tasks: Number of concurrently executed tasks.
     :type number_of_tasks: int
-    :param config_file:
-    :type config_file:
     :param debug: Whether to enable debug mode.
     :type debug: bool
-    :param broker:
-    :type broker:
-    :param broker_args:
-    :type broker_args:
-    :param policy:
-    :type policy:
-    :param policy_args:
-    :type policy_args:
     :param log_level:
     :type log_level:
     :param log_file:
     :type log_file:
     """
     _set_logger(sink=log_file, level=log_level)
-
-    if config_file:
-        settings.load_file(config_file)
-
-    if broker:
-        settings.set('broker.name', broker)
-    if broker_args:
-        settings.set('broker.args', broker_args)
-    if policy:
-        settings.set('policy.name', policy)
-    if policy_args:
-        settings.set('policy.args', policy_args)
-
-    settings.validators.clear()
-    settings.validators.register(validators['broker.name'])
-    settings.validators.register(validators['broker.args'])
-    settings.validators.register(validators['policy.name'])
-    settings.validators.register(validators['policy.args'])
-    try:
-        settings.validators.validate()
-    except ValidationError as e:
-        click.echo(
-            click.style(
-                text=f'Configuration validation failed. Detail: {e.message}',
-                fg='red',
-            )
-        )
-        raise click.Abort()
 
     chatbot = ChatBot(
         num_of_tasks=number_of_tasks,
@@ -176,50 +128,16 @@ def bot_serve(
 @bot_group.command(
     name='chat', help='Start an interactive bot conversation environment.'
 )
-@options.config_file_option
-@options.policy_name_option
-@options.policy_args_option
 @click.option('--debug', is_flag=True, help='Enable debug mode.')
 @_coro_cmd
 async def bot_chat(
-    config_file: str,
-    policy: str,
-    policy_args: dict,
     debug: bool,
 ):
     """Start an interactive bot conversation environment.
 
-    :param config_file:
-    :type config_file:
-    :param policy:
-    :type policy:
-    :param policy_args:
-    :type policy_args:
     :param debug: Whether to enable debug mode.
     :type debug: bool
     """
-    if config_file:
-        settings.load_file(config_file)
-
-    if policy:
-        settings.set('policy.name', policy)
-    if policy_args:
-        settings.set('policy.args', policy_args)
-
-    settings.validators.clear()
-    settings.validators.register(validators['policy.name'])
-    settings.validators.register(validators['policy.args'])
-    try:
-        settings.validators.validate()
-    except ValidationError as e:
-        click.echo(
-            click.style(
-                text=f'Configuration validation failed. Detail: {e.message}',
-                fg='red',
-            )
-        )
-        raise click.Abort()
-
     chatbot = ChatBot(
         run_mode=BotRunMode.Standalone,
         debug=debug,
@@ -313,20 +231,10 @@ def channel_group():
     type=click.IntRange(min=1),
     help='Number of concurrently executed tasks.',
 )
-@options.config_file_option
-@options.channel_agent_name_option
-@options.channel_agent_args_option
-@options.broker_name_option
-@options.broker_args_option
 @options.log_level_option
 @options.log_file_option
 def channel_serve_agent(
     number_of_tasks: int,
-    config_file: str,
-    channel_agent: str,
-    channel_agent_args: dict,
-    broker: str,
-    broker_args: dict,
     log_level: str,
     log_file: str,
 ):
@@ -334,16 +242,6 @@ def channel_serve_agent(
 
     :param number_of_tasks: Number of concurrently executed tasks.
     :type number_of_tasks: int
-    :param config_file:
-    :type config_file:
-    :param channel_agent: Channel name.
-    :type channel_agent: str
-    :param channel_agent_args: Channel arguments.
-    :type channel_agent_args: dict
-    :param broker:
-    :type broker:
-    :param broker_args:
-    :type broker_args:
     :param log_level:
     :type log_level:
     :param log_file:
@@ -351,36 +249,8 @@ def channel_serve_agent(
     """
     _set_logger(sink=log_file, level=log_level)
 
-    if config_file:
-        settings.load_file(config_file)
-
-    if channel_agent:
-        settings.set('channel.agent.name', channel_agent)
-    if channel_agent_args:
-        settings.set('channel.agent.args', channel_agent_args)
-    if broker:
-        settings.set('broker.name', broker)
-    if broker_args:
-        settings.set('broker.args', broker_args)
-
-    settings.validators.clear()
-    settings.validators.register(validators['broker.name'])
-    settings.validators.register(validators['broker.args'])
-    settings.validators.register(validators['channel.agent.name'])
-    settings.validators.register(validators['channel.agent.args'])
-    try:
-        settings.validators.validate()
-    except ValidationError as e:
-        click.echo(
-            click.style(
-                text=f'Configuration validation failed. Detail: {e.message}',
-                fg='red',
-            )
-        )
-        raise click.Abort()
-
     agent = ChannelAgent.get_agent(
-        settings.channel.agent.name,
+        settings.channel.name,
         num_of_tasks=number_of_tasks,
     )
     try:
@@ -392,63 +262,18 @@ def channel_serve_agent(
 @channel_group.command(
     name='serve_webhook', help='Run webhook server to receive events.'
 )
-@options.config_file_option
-@options.channel_webhook_name_option
-@options.channel_webhook_args_option
-@options.broker_name_option
-@options.broker_args_option
-@options.channel_uvicorn_args_option
 @options.log_level_option
 @options.log_file_option
 @_coro_cmd
 async def channel_serve_webhook(
-    config_file: str,
-    channel_webhook: str,
-    channel_webhook_args: dict,
-    broker: str,
-    broker_args: dict,
-    channel_uvicorn_args: dict,
     log_level: str,
     log_file: str,
 ):
     _set_logger(sink=log_file, level=log_level)
 
-    if config_file:
-        settings.load_file(config_file)
+    webhook = await ChannelWebhookFactory.get_webhook(settings.channel.name)
 
-    if channel_webhook:
-        settings.set('channel.webhook.name', channel_webhook)
-    if channel_webhook_args:
-        settings.set('channel.webhook.args', channel_webhook_args)
-    if channel_uvicorn_args:
-        settings.set('channel.uvicorn.args', channel_uvicorn_args)
-    if broker:
-        settings.set('broker.name', broker)
-    if broker_args:
-        settings.set('broker.args', broker_args)
-
-    settings.validators.clear()
-    settings.validators.register(validators['broker.name'])
-    settings.validators.register(validators['broker.args'])
-    settings.validators.register(validators['channel.webhook.name'])
-    settings.validators.register(validators['channel.webhook.args'])
-    settings.validators.register(validators['channel.uvicorn.args'])
-    try:
-        settings.validators.validate()
-    except ValidationError as e:
-        click.echo(
-            click.style(
-                text=f'Configuration validation failed. Detail: {e.message}',
-                fg='red',
-            )
-        )
-        raise click.Abort()
-
-    webhook = await ChannelWebhookFactory.get_webhook(
-        settings.channel.webhook.name
-    )
-
-    config = uvicorn.Config(app=webhook, **settings.channel.uvicorn.args)
+    config = uvicorn.Config(app=webhook, **settings.uvicorn)
     server = uvicorn.Server(config)
     await server.serve()
 
@@ -462,7 +287,6 @@ def config_group():
 @config_group.command(
     name='show', help='Show current configuration information.'
 )
-@options.config_file_option
 @click.option(
     '-k',
     '--config-key',
@@ -470,12 +294,8 @@ def config_group():
     help='Configuration key.',
 )
 def config_show(
-    config_file: str,
     config_key: str,
 ):
-    if config_file:
-        settings.load_file(config_file)
-
     console = Console()
     if config_key is None:
         console.print(settings.as_dict())
@@ -500,17 +320,55 @@ def config_show(
 @_coro_cmd
 async def init(silence: bool, overwrite: bool):
     """Initialize the AilingBot environment."""
+    file_path = os.path.join('.', 'settings.toml')
+    if not overwrite:
+        if os.path.exists(file_path):
+            click.echo(
+                click.style(
+                    text=f'Configuration file {file_path} already exists.',
+                    fg='yellow',
+                )
+            )
+            raise click.Abort()
+
+    config: dict = {
+        'lang': 'zh_CN',
+        'tz': 'Asia/Shanghai',
+        'policy': {},
+        'broker': {},
+        'channel': {},
+        'uvicorn': {
+            'host': '0.0.0.0',
+            'port': 8080,
+        },
+    }
     if silence:
-        file_path = os.path.join('.', 'settings.toml')
-        policy = 'lc_conversation_chain'
-        broker = 'pika'
-        channel = 'wechatwork'
+        config['policy'] = {
+            'name': 'lc_conversation_chain',
+            'llm': {
+                '_type': 'openai',
+                'model_name': 'gpt-3.5-turbo',
+                'openai_api_key': '',
+                'temperature': 0,
+            },
+        }
+        config['broker'] = {
+            'name': 'pika',
+            'port': 5672,
+            'user': '',
+            'password': '',
+            'timeout': 5,
+            'queue_name_prefix': '',
+        }
+        config['channel'] = {
+            'name': 'wechatwork',
+            'corpid': '',
+            'corpsecret': '',
+            'agentid': 0,
+            'token': '',
+            'aes_key': '',
+        }
     else:
-        session = PromptSession()
-        file_path = await session.prompt_async(
-            FormattedText([('skyblue', 'Enter the configuration file: ')]),
-            default=os.path.join('.', 'settings.toml'),
-        )
         policy = await display_radio_prompt(
             title='Select chat policy:',
             values=[
@@ -523,11 +381,54 @@ async def init(silence: bool, overwrite: bool):
             ],
             cancel_value='Configure Later',
         )
+        if policy == 'lc_llm_chain':
+            config['policy'] = {
+                'name': 'lc_llm_chain',
+                '_type': 'llm_chain',
+                'llm': {
+                    '_type': 'openai',
+                    'model_name': 'gpt-3.5-turbo',
+                    'openai_api_key': '',
+                    'temperature': 0,
+                },
+                'prompt': {
+                    '_type': 'prompt',
+                    'template': tomlkit.string(
+                        """Human: {input}
+
+AI:
+""",
+                        multiline=True,
+                    ),
+                    'input_variables': ['input'],
+                },
+            }
+        elif policy == 'lc_conversation_chain':
+            config['policy'] = {
+                'name': 'lc_conversation_chain',
+                'llm': {
+                    '_type': 'openai',
+                    'model_name': 'gpt-3.5-turbo',
+                    'openai_api_key': '',
+                    'temperature': 0,
+                },
+            }
+
         broker = await display_radio_prompt(
             title='Select broker:',
             values=[(x, x) for x in ['pika', 'Configure Later']],
             cancel_value='Configure Later',
         )
+        if broker == 'pika':
+            config['broker'] = {
+                'name': 'pika',
+                'port': 5672,
+                'user': '',
+                'password': '',
+                'timeout': 5,
+                'queue_name_prefix': '',
+            }
+
         channel = await display_radio_prompt(
             title='Select channel:',
             values=[
@@ -535,70 +436,25 @@ async def init(silence: bool, overwrite: bool):
             ],
             cancel_value='Configure Later',
         )
-
-    if not overwrite:
-        if os.path.exists(file_path):
-            click.echo(
-                click.style(
-                    text=f'Configuration file {file_path} already exists.',
-                    fg='yellow',
-                )
-            )
-            raise click.Abort()
-
-    if policy == 'Configure Later':
-        policy_name = ''
-        policy_args = ''
-    else:
-        policy_name = policy
-        if policy == 'lc_llm_chain':
-            policy_args = setting.LC_LLM_CHAIN_POLICY_ARGS_SETTINGS
-        elif policy_name == 'lc_conversation_chain':
-            policy_args = setting.LC_CONVERSATION_CHAIN_POLICY_ARGS_SETTINGS
-        else:
-            policy_args = ''
-
-    if broker == 'Configure Later':
-        broker_name = ''
-        broker_args = ''
-    else:
-        broker_name = broker
-        if broker == 'pika':
-            broker_args = setting.PIKA_BROKER_ARGS_SETTINGS
-        else:
-            broker_args = ''
-
-    if channel == 'Configure Later':
-        channel_name = ''
-        channel_agent_args = ''
-        channel_webhook_args = ''
-    else:
-        channel_name = channel
         if channel == 'wechatwork':
-            channel_agent_args = setting.WECHATWORK_CHANNEL_AGENT_ARGS_SETTINGS
-            channel_webhook_args = (
-                setting.WECHATWORK_CHANNEL_WEBHOOK_ARGS_SETTINGS
-            )
+            config['channel'] = {
+                'name': 'wechatwork',
+                'corpid': '',
+                'corpsecret': '',
+                'agentid': 0,
+                'token': '',
+                'aes_key': '',
+            }
         elif channel == 'feishu':
-            channel_agent_args = setting.FEISHU_CHANNEL_AGENT_ARGS_SETTINGS
-            channel_webhook_args = setting.FEISHU_CHANNEL_WEBHOOK_ARGS_SETTINGS
-        else:
-            channel_agent_args = ''
-            channel_webhook_args = ''
-
-    content = setting.MAIN_SETTINGS.format(
-        broker_name,
-        broker_args,
-        policy_name,
-        policy_args,
-        channel_name,
-        channel_agent_args,
-        channel_name,
-        channel_webhook_args,
-    )
+            config['channel'] = {
+                'name': 'feishu',
+                'app_id': '',
+                'app_secret': '',
+                'verification_token': 0,
+            }
 
     with open(file_path, 'w') as f:
-        f.write(content)
+        f.write(tomlkit.dumps(config))
     click.echo(
         click.style(
             text=f'Configuration file {file_path} has been created.',

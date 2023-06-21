@@ -52,5 +52,7 @@ validators = {
 settings = Dynaconf(
     envvar_prefix='AILINGBOT',
     load_dotenv=True,
-    settings_files=[],
+    settings_files=[
+        'settings.toml',
+    ],
 )

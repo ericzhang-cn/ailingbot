@@ -10,6 +10,7 @@ from loguru import logger
 import ailingbot.shared.errors
 from ailingbot.brokers.broker import MessageBroker
 from ailingbot.chat.messages import ResponseMessage, RequestMessage
+from ailingbot.config import settings
 
 
 class PikaMessageBroker(MessageBroker):
@@ -18,38 +19,16 @@ class PikaMessageBroker(MessageBroker):
     Using Pika(AMQP protocol) as message broker.
     """
 
-    def __init__(
-        self,
-        *,
-        host: str = 'localhost',
-        port: int = 5672,
-        user: str = '',
-        password: str = '',
-        timeout: int = 5,
-        queue_name_prefix: str = '',
-    ):
-        """Creates instance.
-
-        :param host: AMQP host.
-        :type host: str
-        :param port: AMQP port.
-        :type port: int
-        :param user: AMQP user.
-        :type user: str
-        :param password: AMQP password.
-        :type password: str
-        :param timeout: Timeout for consuming message.
-        :type timeout: int
-        :param queue_name_prefix: Prefix of queue name.
-        :type queue_name_prefix: str
-        """
+    def __init__(self):
+        """Creates instance."""
         super(PikaMessageBroker, self).__init__()
 
-        self.host = host
-        self.port = port
-        self.user = user
-        self.password = password
-        self.timeout = timeout
+        self.host = (settings.broker.host or 'localhost',)
+        self.port = (settings.broker.port or 5672,)
+        self.user = settings.broker.user or ''
+        self.password = settings.broker.password or ''
+        self.timeout = settings.broker.timeout or 5
+        self.queue_name_prefix = (settings.broker.queue_name_prefix or '',)
         self.connection: typing.Optional[
             aio_pika.abc.AbstractConnection
         ] = None
@@ -60,10 +39,12 @@ class PikaMessageBroker(MessageBroker):
 
         self.req_queue_name = 'ailingbot_request_queue'
         self.resp_queue_name = 'ailingbot_response_queue'
-        if queue_name_prefix != '':
-            self.req_queue_name = f'{queue_name_prefix}_{self.req_queue_name}'
+        if self.queue_name_prefix != '':
+            self.req_queue_name = (
+                f'{self.queue_name_prefix}_{self.req_queue_name}'
+            )
             self.resp_queue_name = (
-                f'{queue_name_prefix}_{self.resp_queue_name}'
+                f'{self.queue_name_prefix}_{self.resp_queue_name}'
             )
 
     async def _initialize(self) -> None:

@@ -60,9 +60,7 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
     def __init__(self):
         super(FeishuWebhookFactory, self).__init__()
 
-        self.verification_token = (
-            settings.channel.webhook.args.verification_token
-        )
+        self.verification_token = settings.channel.verification_token
 
         self.broker: typing.Optional[MessageBroker] = None
         self.app: typing.Optional[ASGIApplication | typing.Callable] = None

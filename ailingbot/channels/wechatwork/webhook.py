@@ -22,8 +22,8 @@ class WechatworkWebhookFactory(ChannelWebhookFactory):
     def __init__(self):
         super(WechatworkWebhookFactory, self).__init__()
 
-        self.token = settings.channel.webhook.args.token
-        self.aes_key = settings.channel.webhook.args.aes_key
+        self.token = settings.channel.token
+        self.aes_key = settings.channel.aes_key
 
         self.broker: typing.Optional[MessageBroker] = None
         self.app: typing.Optional[ASGIApplication | typing.Callable] = None

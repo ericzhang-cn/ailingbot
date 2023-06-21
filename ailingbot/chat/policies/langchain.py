@@ -14,6 +14,7 @@ from ailingbot.chat.messages import (
     FallbackResponseMessage,
 )
 from ailingbot.chat.policy import ChatPolicy
+from ailingbot.config import settings
 
 
 class LCChainChatPolicy(ChatPolicy):
@@ -23,18 +24,20 @@ class LCChainChatPolicy(ChatPolicy):
         self,
         *,
         debug: bool = False,
-        lc_chain_config: dict,
     ):
         super(LCChainChatPolicy, self).__init__(debug=debug)
-
-        self.lc_chain_config = lc_chain_config
 
         self.chain: dict[str, Chain] = {}
 
     async def _load_chain(self) -> Chain:
+        config = {
+            '_type': settings.policy._type,
+            'llm': settings.policy.llm,
+            'prompt': settings.policy.prompt,
+        }
         if self.debug:
-            self.lc_chain_config['verbose'] = True
-        return load_chain_from_config(self.lc_chain_config)
+            config['verbose'] = True
+        return load_chain_from_config(config)
 
     async def respond(
         self, *, conversation_id: str, message: RequestMessage
@@ -62,14 +65,15 @@ class LCConversationChain(LCChainChatPolicy):
         self,
         *,
         debug: bool = False,
-        lc_chain_config: dict,
     ):
         super(LCConversationChain, self).__init__(
-            debug=debug, lc_chain_config=lc_chain_config
+            debug=debug,
         )
 
     async def _load_chain(self) -> Chain:
-        if self.debug:
-            self.lc_chain_config['verbose'] = True
-        llm = load_llm_from_config(self.lc_chain_config.get('llm', {}))
-        return ConversationChain(llm=llm, memory=ConversationBufferMemory())
+        llm = load_llm_from_config(settings.policy.llm)
+        return ConversationChain(
+            llm=llm,
+            memory=ConversationBufferMemory(),
+            verbose=self.debug,
+        )

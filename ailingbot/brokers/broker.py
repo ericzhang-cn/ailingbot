@@ -50,7 +50,7 @@ class MessageBroker(AbstractAsyncComponent, abc.ABC):
         raise NotImplementedError
 
     @staticmethod
-    def get_broker(name: str, **kwargs) -> MessageBroker:
+    def get_broker(name: str) -> MessageBroker:
         """Gets broker instance.
 
         :param name: Built-in broker name or full path of broker class.
@@ -61,8 +61,8 @@ class MessageBroker(AbstractAsyncComponent, abc.ABC):
         if name.lower() == 'pika':
             from ailingbot.brokers.pika_broker import PikaMessageBroker
 
-            instance = PikaMessageBroker(**kwargs)
+            instance = PikaMessageBroker()
         else:
-            instance = get_class_dynamically(name)(**kwargs)
+            instance = get_class_dynamically(name)()
 
         return instance

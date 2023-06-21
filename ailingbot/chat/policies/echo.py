@@ -5,7 +5,6 @@ from ailingbot.chat.messages import (
     RequestMessage,
     ResponseMessage,
     TextRequestMessage,
-    TextResponseMessage,
     FallbackResponseMessage,
     TabularResponseMessage,
 )
@@ -19,6 +18,7 @@ class EchoChatPolicy(ChatPolicy):
         self,
         *,
         debug: bool = False,
+        **kwargs,
     ):
         super(EchoChatPolicy, self).__init__(debug=debug)
 

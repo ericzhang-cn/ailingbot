@@ -26,8 +26,8 @@ class FeishuAgent(ChannelAgent):
             num_of_tasks=num_of_tasks,
         )
 
-        self.app_id = settings.channel.agent.args.app_id
-        self.app_secret = settings.channel.agent.args.app_secret
+        self.app_id = settings.channel.app_id
+        self.app_secret = settings.channel.app_secret
         self.access_token: typing.Optional[str] = None
         self.expire_in: typing.Optional[arrow.Arrow] = None
 

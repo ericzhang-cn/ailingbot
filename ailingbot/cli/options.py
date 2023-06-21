@@ -36,76 +36,6 @@ class TableParamType(click.ParamType):
 
 env_var_prefix = 'AILINGBOT'
 
-config_file_option = click.option(
-    '-c',
-    '--config-file',
-    type=click.Path(),
-    help='Configuration file path.',
-)
-
-broker_name_option = click.option(
-    '--broker',
-    type=click.STRING,
-    help=f'Broker name or class(read from environment variable {env_var_prefix}_BROKER__NAME if is not passed into).',
-    envvar=f'{env_var_prefix}_BROKER__NAME',
-)
-
-broker_args_option = click.option(
-    '--broker-args',
-    type=TableParamType(),
-    help=f'Broker arguments(read from environment variable {env_var_prefix}_BROKER__ARGS if is not passed into).',
-    envvar=f'{env_var_prefix}_BROKER__ARGS',
-)
-
-policy_name_option = click.option(
-    '--policy',
-    type=click.STRING,
-    help=f'Policy name or class(read from environment variable {env_var_prefix}_POLICY__NAME if is not passed into).',
-    envvar=f'{env_var_prefix}_POLICY__NAME',
-)
-
-policy_args_option = click.option(
-    '--policy-args',
-    type=TableParamType(),
-    help=f'Policy arguments(read from environment variable {env_var_prefix}_POLICY__ARGS if is not passed into).',
-    envvar=f'{env_var_prefix}_POLICY__ARGS',
-)
-
-channel_agent_name_option = click.option(
-    '--channel-agent',
-    type=click.STRING,
-    help=f'Channel agent name or class(read from environment variable {env_var_prefix}_CHANNEL__AGENT__NAME if is not passed into).',
-    envvar=f'{env_var_prefix}_CHANNEL__AGENT__NAME',
-)
-
-channel_agent_args_option = click.option(
-    '--channel-agent-args',
-    type=TableParamType(),
-    help=f'Channel agent arguments(read from environment variable {env_var_prefix}_CHANNEL__AGENT__ARGS if is not passed into).',
-    envvar=f'{env_var_prefix}_CHANNEL__AGENT__ARGS',
-)
-
-channel_webhook_name_option = click.option(
-    '--channel-webhook',
-    type=click.STRING,
-    help=f'Channel webhook name or class(read from environment variable {env_var_prefix}_CHANNEL__WEBHOOK__NAME if is not passed into).',
-    envvar=f'{env_var_prefix}_CHANNEL__WEBHOOK__NAME',
-)
-
-channel_webhook_args_option = click.option(
-    '--channel-webhook-args',
-    type=TableParamType(),
-    help=f'Channel webhook arguments(read from environment variable {env_var_prefix}_CHANNEL__WEBHOOK__ARGS if is not passed into).',
-    envvar=f'{env_var_prefix}_CHANNEL__WEBHOOK__ARGS',
-)
-
-channel_uvicorn_args_option = click.option(
-    '--channel-uvicorn-args',
-    type=TableParamType(),
-    help=f'Channel uvicorn arguments(read from environment variable {env_var_prefix}_CHANNEL__UVICORN__ARGS if is not passed into).',
-    envvar=f'{env_var_prefix}_CHANNEL__UVICORN__ARGS',
-)
-
 log_level_option = click.option(
     '--log-level',
     type=click.Choice(
@@ -120,7 +50,7 @@ log_level_option = click.option(
         ],
         case_sensitive=False,
     ),
-    help=f'The minimum severity level from which logged messages should be sent to(read from environment variable {env_var_prefix}_LOG__LEVEL if is not passed into).',
+    help=f'The minimum severity level from which logged messages should be sent to(read from environment variable {env_var_prefix}_LOG_LEVEL if is not passed into).',
     envvar=f'{env_var_prefix}_LOG__LEVEL',
     default='TRACE',
     show_default=True,
@@ -129,7 +59,7 @@ log_level_option = click.option(
 log_file_option = click.option(
     '--log-file',
     type=click.STRING,
-    help=f'STDOUT, STDERR, or file path(read from environment variable {env_var_prefix}_LOG__FILE if is not passed into).',
+    help=f'STDOUT, STDERR, or file path(read from environment variable {env_var_prefix}_LOG_FILE if is not passed into).',
     envvar=f'{env_var_prefix}_LOG__FILE',
     default='STDERR',
     show_default=True,

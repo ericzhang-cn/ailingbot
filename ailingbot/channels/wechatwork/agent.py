@@ -25,9 +25,9 @@ class WechatworkAgent(ChannelAgent):
             num_of_tasks=num_of_tasks,
         )
 
-        self.corpid = settings.channel.agent.args.corpid
-        self.corpsecret = settings.channel.agent.args.corpsecret
-        self.agentid = settings.channel.agent.args.agentid
+        self.corpid = settings.channel.corpid
+        self.corpsecret = settings.channel.corpsecret
+        self.agentid = settings.channel.agentid
         self.access_token: typing.Optional[str] = None
         self.expire_in: typing.Optional[arrow.Arrow] = None
 

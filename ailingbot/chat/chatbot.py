@@ -80,16 +80,12 @@ class ChatBot(AbstractAsyncRunnable):
 
     async def _startup(self):
         if self.run_mode == BotRunMode.Broker:
-            self.broker = MessageBroker.get_broker(
-                settings.broker.name,
-                **settings.broker.args,
-            )
+            self.broker = MessageBroker.get_broker(name=settings.broker.name)
             await self.broker.initialize()
 
         self.policy = ChatPolicy.get_policy(
-            settings.policy.name,
+            name=settings.policy.name,
             debug=self.debug,
-            **settings.policy.args,
         )
         await self.policy.initialize()
 
