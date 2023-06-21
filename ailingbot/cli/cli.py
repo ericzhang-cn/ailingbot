@@ -354,6 +354,7 @@ async def init(silence: bool, overwrite: bool):
         }
         config['broker'] = {
             'name': 'pika',
+            'host': 'localhost',
             'port': 5672,
             'user': '',
             'password': '',
@@ -422,6 +423,7 @@ AI:
         if broker == 'pika':
             config['broker'] = {
                 'name': 'pika',
+                'host': 'localhost',
                 'port': 5672,
                 'user': '',
                 'password': '',

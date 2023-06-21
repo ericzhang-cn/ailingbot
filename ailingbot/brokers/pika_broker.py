@@ -23,12 +23,12 @@ class PikaMessageBroker(MessageBroker):
         """Creates instance."""
         super(PikaMessageBroker, self).__init__()
 
-        self.host = (settings.broker.host or 'localhost',)
-        self.port = (settings.broker.port or 5672,)
+        self.host = settings.broker.host or 'localhost'
+        self.port = settings.broker.port or 5672
         self.user = settings.broker.user or ''
         self.password = settings.broker.password or ''
         self.timeout = settings.broker.timeout or 5
-        self.queue_name_prefix = (settings.broker.queue_name_prefix or '',)
+        self.queue_name_prefix = settings.broker.queue_name_prefix or ''
         self.connection: typing.Optional[
             aio_pika.abc.AbstractConnection
         ] = None
