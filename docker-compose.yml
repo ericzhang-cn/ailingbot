@@ -9,7 +9,10 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - rabbit
-    restart: on-failure
+    environment:
+      AILINGBOT_BROKER__HOST: rabbit
+      AILINGBOT_POLICY__LLM__OPENAI_API_KEY: ${AILINGBOT_POLICY__LLM__OPENAI_API_KEY} 
+    restart: unless-stopped
     command: poetry run ailingbot bot serve
   agent:
     build:
@@ -17,7 +20,12 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - rabbit
-    restart: on-failure
+    environment:
+      AILINGBOT_BROKER__HOST: rabbit
+      AILINGBOT_CHANNEL__CORPID: ${AILINGBOT_CHANNEL__CORPID}
+      AILINGBOT_CHANNEL__CORPSECRET: ${AILINGBOT_CHANNEL__CORPSECRET}
+      AILINGBOT_CHANNEL__AGENTID: ${AILINGBOT_CHANNEL__AGENTID}
+    restart: unless-stopped
     command: poetry run ailingbot channel serve_agent
   webhook:
     build:
@@ -27,5 +35,9 @@ services:
       - "8080:8080"
     depends_on:
       - rabbit
-    restart: on-failure
+    environment:
+      AILINGBOT_BROKER__HOST: rabbit
+      AILINGBOT_CHANNEL__TOKEN: ${AILINGBOT_CHANNEL__TOKEN}
+      AILINGBOT_CHANNEL__AES_KEY: ${AILINGBOT_CHANNEL__AES_KEY}
+    restart: unless-stopped
     command: poetry run ailingbot channel serve_webhook
