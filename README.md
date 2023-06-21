@@ -8,31 +8,29 @@
 
 <img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/logo.png" alt="logo" width="50" height="50"/>
 
-AilingBot - An all-in-one solution to empower your IM bot with AI.
+AilingBot - An all-in-one solution to empower your IM bot with LLM.
 
 # Features
 
-- 💯**Open source&Free**: Completely open source and free.
-- 📦**Out of the box**: No development is required, with pre-built capabilities to integrate with mainstream IM and LLM
-  models.
-- 🔗**Integrated LangChain**: The ability to integrate LangChain allows for the direct use of LangChain's pre-existing
-  chains or agents.
-- 🧩**Modular**: The project is organized in a modular way, with modules depending on abstract protocols, and similar
-  modules
-  implementing the protocols for plug-and-play functionality.
-- 💻**Extensible**: It can expand the usage scenarios and capabilities of AilingBot. For example, integrating with new
-  instant messaging platforms, new language learning models, or developing their own chains, agents, and chat policy.
-- 🚀**High Performance**: AilingBot uses coroutine-based asynchronous mode to improve the system's high-concurrency
-  performance. Meanwhile, the core servers can start multiple processes to further improve the system's high-concurrency
-  processing capabilities.
-- 🔌**Integrating through API**: AilingBot provides a set of clear API interfaces, which facilitates integration and
-  collaboration with other systems and processes.
+- 💯**Open source & free**: Completely open source and free
+- 📦**Out-of-the-box**: No development required, pre-installed with the ability to integrate with existing mainstream IM
+  and LLM models
+- 🔗**Integrated with LangChain**: Integrated with LangChain's ability to directly use pre-installed Chains or Agents
+- 🧩**Modular**: The project is organized in a modular way, with modules depending on abstract protocols between them.
+  Similar modules can implement protocols and be used immediately
+- 💻**Scalable**: AilingBot's usage scenarios and capabilities can be expanded. For example, integrating with new IM, new
+  LLM, or developing your own Chain, Agent, and chat policy
+- 🚀**High performance**: AilingBot uses coroutine-based asynchronous mode to improve system's high concurrency
+  performance. At the same time, the core process can start multiple processes to further improve the system's high
+  concurrency processing capability
+- 🔌**Integrated through API**: AilingBot provides a set of clear API interfaces for easy integration and collaboration
+  with other systems and processes
 
-# IM support list
+# List of supported IMs
 
 ## Supported
 
-- WeChat Work
+- Enterprise WeChat
 - Feishu
 
 ## Coming soon
@@ -40,176 +38,122 @@ AilingBot - An all-in-one solution to empower your IM bot with AI.
 - DingTalk
 - Slack
 
-# Quickstart Guide
+# Quick Start Guide
 
-## Launch an AI Chatbot in 5 Minutes
+## Start an AI chatbot in 5 minutes
 
-### Installation
+Below you will see how to quickly start a command-line-based AI chatbot through AilingBot, with the effect as shown in
+the figure:
+![Command-line robot](https://github.com/ericzhang-cn/ailingbot/raw/main/img/command-line-screenshot.png)
+
+
+> 💡First, you need an OpenAI API key. If you don't have one, apply here: https://platform.openai.com/account/api-keys
+
+### Through Docker
+
+```shell
+git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
+cd ailingbot
+docker build -t ailingbot .
+docker run -it --rm -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={Your OpenAI API key} ailingbot poetry run ailingbot bot chat
+```
+
+### Through PIP
+
+#### Installation
 
 ```shell
 pip install ailingbot
 ```
 
-You also need an OpenAI API key. If you don't have one, please apply for it
-here: https://platform.openai.com/account/api-keys
-
-### Initialize Configuration File
+#### Generate configuration file
 
 ```shell
-ailingbot init --silence
+ailingbot init --silence --overwrite
 ```
 
-This will create a file named settings.toml in the current directory,
-which is the configuration file for AilingBot. Next, modify the necessary configurations.
-To start the bot, you only need to configure one item.
-Find the following section in settings.toml:
+At this point, a file called settings.toml will be created in the current directory, which is AilingBot's configuration
+file.
+Next, modify the necessary configurations. To start the robot, only one configuration is required. Find the following
+section in settings.toml:
 
 ```toml
-[policy.args.lc_chain_config.llm]
+[policy.llm]
 _type = "openai"
 model_name = "gpt-3.5-turbo"
-openai_api_key = "Your OpenAI API key"
+openai_api_key = ""
 temperature = 0
 ```
 
-Change the value of `openai_api_key` to your actual OpenAI API key.
+Change the value of `openai_api_key` to your real OpenAI API key.
 
-### Start the Bot
+#### Start the robot
 
-Start the bot with the following command:
+Start the robot with the following command:
 
 ```shell
-ailingbot bot chat -c settings.toml
+ailingbot bot chat
 ```
 
-You can now have a conversation with the bot through an interactive dialogue environment, as shown below:
-![Command-Line Screenshot](https://github.com/ericzhang-cn/ailingbot/raw/main/img/command-line-screenshot.png)
+## Integrating Instant Messaging Tools
 
-## Connect to Instant Messaging Tools
+Here's how to quickly integrate the above robot into Enterprise WeChat.
 
-Below we take WeChat Work as an example to demonstrate how AilingBot can be quickly connected to instant messaging
-tools.
+### Through Docker
 
-### Prerequisites
+```shell
+export AILINGBOT_CHANNEL__AGENTID={Your Enterprise WeChat application AgentId}
+export AILINGBOT_CHANNEL__CORPSECRET={Your Enterprise WeChat application CorpSecret}
+export AILINGBOT_CHANNEL__AES_KEY={Your Enterprise WeChat application Webhook AES Key}
+export AILINGBOT_CHANNEL__CORPID={Your Enterprise WeChat application CorpId}
+export AILINGBOT_CHANNEL__TOKEN={Your Enterprise WeChat application Webhook Token}
+export AILINGBOT_POLICY__LLM__OPENAI_API_KEY={Your OpenAI API key}
+docker compose up
+```
 
-To connect to WeChat Work, in addition to the prerequisites above, you also need to install the following environment:
+### Through PIP
 
-- RabbitMQ: https://www.rabbitmq.com/
+#### Modify the configuration file
 
-- Assumes you already have a usable WeChat Work app and are familiar with the WeChat Work app development process. If
-  you're not familiar with this, please refer to the WeChat Work official developer
-  documentation: https://developer.work.weixin.qq.com/
-
-### Modify the configuration file.
-
-Open settings.toml, the complete content is as follows:
+Open `settings.toml` and fill in the following section with your Enterprise WeChat application's real information:
 
 ```toml
-# This is the AilingBot configuration file template. Please modify it as needed.
-
-lang = "zh_CN"
-tz = "Asia/Shanghai"
-
-[broker]
-name = "pika"
-
-[broker.args]
-host = "localhost"
-port = 5672
-user = ""
-password = ""
-timeout = 5
-queue_name_prefix = ""
-
-[policy]
-name = "lc_conversation_chain"
-
-[policy.args]
-
-[policy.args.lc_chain_config.llm]
-_type = "openai"
-model_name = "gpt-3.5-turbo"
-openai_api_key = "Your OpenAI API key"
-temperature = 0
-
 [channel]
-
-[channel.agent]
 name = "wechatwork"
-
-[channel.agent.args]
-corpid = "WechatWork corpid"
-corpsecret = "WechatWork corpsecret"
+corpid = ""
+corpsecret = ""
 agentid = 0
-
-[channel.webhook]
-name = "wechatwork"
-
-[channel.webhook.args]
-token = "WechatWork webhook token"
-aes_key = "WechatWork webhook aes_key"
-
-[channel.uvicorn.args]
-host = "0.0.0.0"
-port = 8080
+token = ""
+aes_key = ""
 ```
 
-Here are the places that need to be filled in as needed:
-
-- `openai_api_key = "Your OpenAI API key"`
-- `corpid = "WechatWork corpid"`
-- `corpsecret = "WechatWork corpsecret"`
-- `agentid = 0`
-- `token = "WechatWork webhook token"`
-- `aes_key = "WechatWork webhook aes_key"`
-
-### Start the Bot
-
-To connect to instant messaging tools, three commands need to be executed to start the corresponding processes
-separately:
-
-Start the Channel Webhook process. The purpose of this process is to receive messages sent by users to the WeChat Work
-app as a webhook:
+#### Start the service
 
 ```shell
-ailingbot channel serve_webhook -c settings.toml
+ailingbot bot serve
+ailingbot bot channel serve_agent
+ailingbot bot channel serve_webhook
 ```
 
-Start the Bot Serve process. The purpose of this process is to listen for user messages received via the webhook and
-generate reply messages based on the corresponding chat policy:
+Finally, we need to go to the Enterprise WeChat management console to configure the webhook address so that Enterprise
+WeChat knows to forward the received user messages to our webhook.
+The URL of the webhook is: `http(s)://your_public_IP:8080/webhook/wechatwork/event/`
 
-```shell
-ailingbot bot serve -c settings.toml
-```
+After completing the above configuration, you can find the robot in Enterprise WeChat and start a conversation:
 
-Start the Channel Agent process. The purpose of this process is to send the reply messages generated by the Bot Serve
-process to the user:
+<img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/wechatwork-screenshot.png" alt="Enterprise WeChat robot" width="400"/>
 
-```shell
-ailingbot channel serve_agent -c settings.toml
-```
+# Development Plan
 
-### Configure Webhook
+- [ ] Provide complete usage and developer documentation
+- [ ] Support more IM clients, such as DingTalk, Slack, etc.
+- [ ] Support more commonly used LLM prompting paradigms and out-of-the-box chat policy
+- [ ] Provide support for common capabilities in LLM Chain, such as Vector Embedding&Query and Grounding
+- [ ] Provide a WebUI
+- [ ] Provide one-click deployment capability based on Docker containers
+- [ ] Enhance system observability and govern
 
-Finally, we need to go to the WeChat Work management console to configure the webhook address so that WeChat Work knows
-to forward the received user messages to our webhook.
-The webhook URL is: `http(s)://your_public_IP:8080/webhook/wechatwork/event/`
-
-After completing the above configuration, you can find the bot in WeChat Work and start a conversation:
-
-<img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/wechatwork-screenshot.png" alt="WeChat Work Bot" width="400"/>
-
-# Roadmap
-
-- [ ] Provide comprehensive user and developer documentation.
-- [ ] Support more IM platforms, such as DingTalk and Slack.
-- [ ] Support more commonly used LLM prompting paradigms and out-of-the-box chat policy.
-- [ ] Provide support for commonly used capabilities in LLM Chain, such as Vector Embedding&Query and Grounding.
-- [ ] Provide a WebUI.
-- [ ] Provide one-click deployment capability based on Docker containers.
-- [ ] Enhance the system's observability and manageability.
-
-# License
+# 许可协议
 
 > MIT License
 >

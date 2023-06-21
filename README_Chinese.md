@@ -37,142 +37,95 @@ AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。
 
 ## 5分钟启动一个AI聊天机器人
 
-### 安装
+下面将看到如何通过AilingBot快速启动一个基于命令行界面的AI机器人，效果如图：
+![命令行机器人](https://github.com/ericzhang-cn/ailingbot/raw/main/img/command-line-screenshot.png)
+
+
+> 💡首先你需要有一个OpenAI API key。如果没有请到这里申请：https://platform.openai.com/account/api-keys
+
+### 通过Docker
+
+```shell
+git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
+cd ailingbot
+docker build -t ailingbot .
+docker run -it --rm -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} ailingbot poetry run ailingbot bot chat
+```
+
+### 通过PIP
+
+#### 安装
 
 ```shell
 pip install ailingbot
 ```
 
-同时你需要有一个OpenAI API key。如果没有请到这里申请：https://platform.openai.com/account/api-keys
-
-### 初始化配置文件
+#### 生成配置文件
 
 ```shell
-ailingbot init --silence
+ailingbot init --silence --overwrite
 ```
 
-此时在当前目录会创建一个叫settings.toml的文件，这个文件就是AilingBot的配置文件。 
+此时在当前目录会创建一个叫settings.toml的文件，这个文件就是AilingBot的配置文件。
 接下来修改必要配置，启动机器人只需一项配置，找到settings.toml中以下部分：
 
 ```toml
-[policy.args.lc_chain_config.llm]
+[policy.llm]
 _type = "openai"
 model_name = "gpt-3.5-turbo"
-openai_api_key = "Your OpenAI API key"
+openai_api_key = ""
 temperature = 0
 ```
 
 将其中`openai_api_key`的值改为你的真实OpenAI API key。
 
-### 启动机器人
+#### 启动机器人
 
 通过如下命令启动机器人：
 
 ```shell
-ailingbot bot chat -c settings.toml
+ailingbot bot chat
 ```
-
-此时你可以通过一个交互式对话环境与机器人进行对话，如下图所示：
-![命令行机器人](https://github.com/ericzhang-cn/ailingbot/raw/main/img/command-line-screenshot.png)
 
 ## 接入即时通讯工具
 
-下面以企业微信为例，演示AilingBot如何快速接入即时通讯工具。
+下面演示如何快速将上面的机器人接入企业微信。
 
-### 前置条件
+### 通过Docker
 
-要接入企业微信，除了上面的前置条件外，还需要安装以下环境：
+```shell
+export AILINGBOT_CHANNEL__AGENTID={你的企业微信应用AgentId}
+export AILINGBOT_CHANNEL__CORPSECRET={你的企业微信应用CorpSecret}
+export AILINGBOT_CHANNEL__AES_KEY={你的企业微信应用Webhook AES Key}
+export AILINGBOT_CHANNEL__CORPID={你的企业微信应用CorpId}
+export AILINGBOT_CHANNEL__TOKEN={你的企业微信应用Webhook Token}
+export AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key}
+docker compose up
+```
 
-- RabbitMQ：https://www.rabbitmq.com/
-- 同时假设你已经有了一个可用的企业微信应用，并熟悉企业微信应用开发流程。如果对这块不熟悉，请参考企业微信官方开发者文档：
-  https://developer.work.weixin.qq.com/
+### 通过PIP
 
-### 修改配置文件
+#### 修改配置文件
 
-打开settings.toml，其完整内容如下：
+打开`settings.toml`，将其中的下面部分填入你的企业微信应用真实信息：
 
 ```toml
-# This is the AilingBot configuration file template. Please modify it as needed.
-
-lang = "zh_CN"
-tz = "Asia/Shanghai"
-
-[broker]
-name = "pika"
-
-[broker.args]
-host = "localhost"
-port = 5672
-user = ""
-password = ""
-timeout = 5
-queue_name_prefix = ""
-
-[policy]
-name = "lc_conversation_chain"
-
-[policy.args]
-
-[policy.args.lc_chain_config.llm]
-_type = "openai"
-model_name = "gpt-3.5-turbo"
-openai_api_key = "Your OpenAI API key"
-temperature = 0
-
 [channel]
-
-[channel.agent]
 name = "wechatwork"
-
-[channel.agent.args]
-corpid = "WechatWork corpid"
-corpsecret = "WechatWork corpsecret"
+corpid = ""
+corpsecret = ""
 agentid = 0
-
-[channel.webhook]
-name = "wechatwork"
-
-[channel.webhook.args]
-token = "WechatWork webhook token"
-aes_key = "WechatWork webhook aes_key"
-
-[channel.uvicorn.args]
-host = "0.0.0.0"
-port = 8080
+token = ""
+aes_key = ""
 ```
 
-这里有如下地方需要填入你的真实配置内容：
-
-- `openai_api_key = "Your OpenAI API key"`
-- `corpid = "WechatWork corpid"`
-- `corpsecret = "WechatWork corpsecret"`
-- `agentid = 0`
-- `token = "WechatWork webhook token"`
-- `aes_key = "WechatWork webhook aes_key"`
-
-### 启动机器人
-
-为了实现接入即时通讯工具，需要分别执行一下三个命令启动对应进程：
-
-启动Channel Webhook进程，这个进程的作用是作为Webhook接收用户发送给企业微信应用的消息：
+#### 启动服务
 
 ```shell
-ailingbot channel serve_webhook -c settings.toml
+ailingbot bot serve
+ailingbot bot channel serve_agent
+ailingbot bot channel serve_webhook
 ```
-
-启动Bot Serve进程，这个进程的作用是监听通过Webhook接收到的用户消息，并按对应会话策略生成回复消息：
-
-```shell
-ailingbot bot serve -c settings.toml
-```
-
-启动Channel Agent进程，这个进程的作用是将Bot Serve进程回复的消息发送给用户：
-
-```shell
-ailingbot channel serve_agent -c settings.toml
-```
-
-### 配置Webhook
 
 最后我们需要去企业微信的管理后台，将webhook地址配置好，以便企业微信知道将接收到的用户消息转发到我们的webhook。
 Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
