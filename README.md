@@ -30,7 +30,7 @@ AilingBot - An all-in-one solution to empower your IM bot with LLM.
 
 ## Supported
 
-- Enterprise WeChat
+- WeChat Work
 - Feishu
 
 ## Coming soon
@@ -60,7 +60,7 @@ docker run -it --rm -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={Your OpenAI API ke
 
 ### Through PIP
 
-#### Installation
+#### Install
 
 ```shell
 pip install ailingbot
@@ -97,7 +97,7 @@ ailingbot bot chat
 
 ## Integrating Instant Messaging Tools
 
-Here's how to quickly integrate the above robot into Enterprise WeChat.
+Here's how to quickly integrate the above robot into WeChat Work.
 
 ### Through Docker
 
@@ -143,7 +143,7 @@ After completing the above configuration, you can find the robot in Enterprise W
 
 <img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/wechatwork-screenshot.png" alt="Enterprise WeChat robot" width="400"/>
 
-# Development Plan
+# Roadmap
 
 - [ ] Provide complete usage and developer documentation
 - [ ] Support more IM clients, such as DingTalk, Slack, etc.
@@ -152,27 +152,3 @@ After completing the above configuration, you can find the robot in Enterprise W
 - [ ] Provide a WebUI
 - [ ] Provide one-click deployment capability based on Docker containers
 - [ ] Enhance system observability and govern
-
-# 许可协议
-
-> MIT License
->
->Copyright (c) 2023 AilingBot
->
->Permission is hereby granted, free of charge, to any person obtaining a copy
-> of this software and associated documentation files (the "Software"), to deal
-> in the Software without restriction, including without limitation the rights
-> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> copies of the Software, and to permit persons to whom the Software is
-> furnished to do so, subject to the following conditions:
->
->The above copyright notice and this permission notice shall be included in all
-> copies or substantial portions of the Software.
->
->THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> SOFTWARE.
