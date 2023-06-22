@@ -1,3 +1,4 @@
+import copy
 import uuid
 
 from langchain import ConversationChain
@@ -71,7 +72,8 @@ class LCConversationChain(LCChainChatPolicy):
         )
 
     async def _load_chain(self) -> Chain:
-        llm = load_llm_from_config(settings.policy.llm)
+        llm_config = copy.deepcopy(settings.policy.llm)
+        llm = load_llm_from_config(llm_config)
         return ConversationChain(
             llm=llm,
             memory=ConversationBufferMemory(),

@@ -15,7 +15,7 @@ from ailingbot.chat.messages import (
     ResponseMessage,
 )
 from ailingbot.chat.policy import ChatPolicy
-from ailingbot.config import settings, validators
+from ailingbot.config import settings
 from ailingbot.shared.abc import AbstractAsyncRunnable
 
 
@@ -55,6 +55,11 @@ class ChatBot(AbstractAsyncRunnable):
         except Exception as e:
             logger.error(e)
             return FallbackResponseMessage(
+                uuid=str(uuid.uuid4()),
+                ack_uuid=message.uuid,
+                receiver_id=message.sender_id,
+                scope=message.scope,
+                echo=message.echo,
                 reason=str(e),
             )
 
@@ -101,11 +106,9 @@ class ChatBot(AbstractAsyncRunnable):
             conversation_id = (
                 f'{conversation_id}-{request_message.scope.value}'
             )
-        if request_message.meta and request_message.meta.get(
-            'conversation_tag', None
-        ):
+        if request_message.meta and request_message.meta.get('chat_id', None):
             conversation_id = (
-                f'{conversation_id}-{request_message.meta["conversation_tag"]}'
+                f'{conversation_id}-{request_message.meta["chat_id"]}'
             )
         conversation_id = conversation_id.casefold()
 
