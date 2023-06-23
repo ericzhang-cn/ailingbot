@@ -344,7 +344,8 @@ async def init(silence: bool, overwrite: bool):
     }
     if silence:
         config['policy'] = {
-            'name': 'lc_conversation_chain',
+            'name': 'lc_conversation',
+            'history_size': 5,
             'llm': {
                 '_type': 'openai',
                 'model_name': 'gpt-3.5-turbo',
@@ -375,38 +376,16 @@ async def init(silence: bool, overwrite: bool):
             values=[
                 (x, x)
                 for x in [
-                    'lc_llm_chain',
-                    'lc_conversation_chain',
+                    'lc_conversation',
                     'Configure Later',
                 ]
             ],
             cancel_value='Configure Later',
         )
-        if policy == 'lc_llm_chain':
+        if policy == 'lc_conversation':
             config['policy'] = {
-                'name': 'lc_llm_chain',
-                '_type': 'llm_chain',
-                'llm': {
-                    '_type': 'openai',
-                    'model_name': 'gpt-3.5-turbo',
-                    'openai_api_key': '',
-                    'temperature': 0,
-                },
-                'prompt': {
-                    '_type': 'prompt',
-                    'template': tomlkit.string(
-                        """Human: {input}
-
-AI:
-""",
-                        multiline=True,
-                    ),
-                    'input_variables': ['input'],
-                },
-            }
-        elif policy == 'lc_conversation_chain':
-            config['policy'] = {
-                'name': 'lc_conversation_chain',
+                'name': 'lc_conversation',
+                'history_size': 5,
                 'llm': {
                     '_type': 'openai',
                     'model_name': 'gpt-3.5-turbo',

@@ -39,18 +39,12 @@ class ChatPolicy(AbstractAsyncComponent, abc.ABC):
         :return: Policy instance.
         :rtype: ChatPolicy
         """
-        if name.lower() == 'echo':
-            from ailingbot.chat.policies.echo import EchoChatPolicy
+        if name.lower() == 'lc_conversation':
+            from ailingbot.chat.policies.langchain import (
+                LCConversationChatPolicy,
+            )
 
-            instance = EchoChatPolicy(debug=debug)
-        elif name.lower() == 'lc_llm_chain':
-            from ailingbot.chat.policies.langchain import LCChainChatPolicy
-
-            instance = LCChainChatPolicy(debug=debug)
-        elif name.lower() == 'lc_conversation_chain':
-            from ailingbot.chat.policies.langchain import LCConversationChain
-
-            instance = LCConversationChain(debug=debug)
+            instance = LCConversationChatPolicy(debug=debug)
         else:
             instance = get_class_dynamically(name)(debug=debug)
 
