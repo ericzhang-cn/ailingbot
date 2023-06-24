@@ -18,7 +18,7 @@ from ailingbot.config import settings
 
 
 class LCConversationChatPolicy(ChatPolicy):
-    """ConversationPolicy implementation for basic conversation LLM."""
+    """Having a direct conversation with a large language model."""
 
     def __init__(
         self,
@@ -69,3 +69,12 @@ class LCConversationChatPolicy(ChatPolicy):
         response.echo = message.echo
 
         return response
+
+
+class LCDocumentQAPolicy(ChatPolicy):
+    """Question-Answering based on documents."""
+
+    async def respond(
+        self, *, conversation_id: str, message: RequestMessage
+    ) -> ResponseMessage:
+        pass

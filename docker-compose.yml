@@ -11,7 +11,7 @@ services:
       - rabbit
     environment:
       AILINGBOT_BROKER__HOST: rabbit
-      AILINGBOT_POLICY__LLM__OPENAI_API_KEY: ${AILINGBOT_POLICY__LLM__OPENAI_API_KEY} 
+      AILINGBOT_POLICY__LLM__OPENAI_API_KEY: ${AILINGBOT_POLICY__LLM__OPENAI_API_KEY}
     restart: unless-stopped
     command: poetry run ailingbot bot serve
   agent:
@@ -22,9 +22,12 @@ services:
       - rabbit
     environment:
       AILINGBOT_BROKER__HOST: rabbit
+      AILINGBOT_CHANNEL__NAME: ${AILINGBOT_CHANNEL__NAME}
       AILINGBOT_CHANNEL__CORPID: ${AILINGBOT_CHANNEL__CORPID}
       AILINGBOT_CHANNEL__CORPSECRET: ${AILINGBOT_CHANNEL__CORPSECRET}
       AILINGBOT_CHANNEL__AGENTID: ${AILINGBOT_CHANNEL__AGENTID}
+      AILINGBOT_CHANNEL__APP_ID: ${AILINGBOT_CHANNEL__APP_ID}
+      AILINGBOT_CHANNEL__APP_SECRET: ${AILINGBOT_CHANNEL__APP_SECRET}
     restart: unless-stopped
     command: poetry run ailingbot channel serve_agent
   webhook:
@@ -37,7 +40,9 @@ services:
       - rabbit
     environment:
       AILINGBOT_BROKER__HOST: rabbit
+      AILINGBOT_CHANNEL__NAME: ${AILINGBOT_CHANNEL__NAME}
       AILINGBOT_CHANNEL__TOKEN: ${AILINGBOT_CHANNEL__TOKEN}
       AILINGBOT_CHANNEL__AES_KEY: ${AILINGBOT_CHANNEL__AES_KEY}
+      AILINGBOT_CHANNEL__VERIFICATION_TOKEN: ${AILINGBOT_CHANNEL__VERIFICATION_TOKEN}
     restart: unless-stopped
     command: poetry run ailingbot channel serve_webhook

@@ -6,6 +6,7 @@ import typing
 from asgiref.typing import ASGIApplication
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
+from starlette.background import BackgroundTasks
 
 from ailingbot.brokers.broker import MessageBroker
 from ailingbot.channels.channel import ChannelWebhookFactory
@@ -77,11 +78,35 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
         async def shutdown() -> None:
             await self.broker.finalize()
 
+        async def _create_request_message_task(event: FeishuEventBody) -> None:
+            """Background task for creating request message from event."""
+            text = json.loads(event.event.message.content).get('text', '')
+            text = ' '.join(
+                [
+                    x
+                    for x in text.split(' ')
+                    if not x.strip().startswith('@_user_')
+                ]
+            )
+            req_msg = TextRequestMessage(
+                uuid=event.event.message.message_id,
+                text=text,
+                sender_id=event.event.sender.sender_id.get('open_id', ''),
+            )
+            if event.event.message.chat_type == 'p2p':
+                req_msg.scope = MessageScope.USER
+            elif event.event.message.chat_type == 'group':
+                req_msg.scope = MessageScope.GROUP
+                req_msg.meta['chat_id'] = event.event.message.chat_id
+
+            await self.broker.produce_request(req_msg)
+
         @self.app.post(
             '/webhook/feishu/event/', status_code=status.HTTP_200_OK
         )
         async def handle_event(
             event: FeishuEventBody,
+            background_tasks: BackgroundTasks,
         ) -> dict:
             """Handle the event request from Feishu.
 
@@ -115,18 +140,7 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
                     detail='Message type is not supported.',
                 )
 
-            req_msg = TextRequestMessage(
-                uuid=event.event.message.message_id,
-                text=json.loads(event.event.message.content).get('text', ''),
-                sender_id=event.event.sender.sender_id.get('open_id', ''),
-            )
-            if event.event.message.chat_type == 'p2p':
-                req_msg.scope = MessageScope.USER
-            elif event.event.message.chat_type == 'group':
-                req_msg.scope = MessageScope.GROUP
-                req_msg.meta['chat_id'] = event.event.message.chat_id
-
-            await self.broker.produce_request(req_msg)
+            background_tasks.add_task(_create_request_message_task, event)
 
             return {}
 

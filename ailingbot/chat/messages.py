@@ -35,6 +35,13 @@ class TextRequestMessage(RequestMessage):
     text: str = ''
 
 
+class FileRequestMessage(RequestMessage):
+    """File request message."""
+
+    type: str
+    content: typing.IO
+
+
 class InputRequestMessage(RequestMessage):
     """Input request message."""
 
