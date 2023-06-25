@@ -5,12 +5,12 @@ import uuid
 
 from langchain import ConversationChain
 from langchain.chains import RetrievalQA
+from langchain.chains.base import Chain
 from langchain.document_loaders import PyPDFLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.llms.loading import load_llm_from_config
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.memory.chat_memory import BaseChatMemory
-from langchain.schema import Document
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.vectorstores.base import VectorStoreRetriever
@@ -83,6 +83,10 @@ class LCConversationChatPolicy(ChatPolicy):
         return response
 
 
+def from_chain_type(llm, chain_type, retriever, return_source_documents):
+    pass
+
+
 class LCDocumentQAPolicy(ChatPolicy):
     """Question-Answering based on documents."""
 
@@ -96,13 +100,9 @@ class LCDocumentQAPolicy(ChatPolicy):
         )
 
         llm_config = copy.deepcopy(settings.policy.llm)
-        llm = load_llm_from_config(llm_config)
+        self.llm = load_llm_from_config(llm_config)
         self.retriever: typing.Optional[VectorStoreRetriever] = None
-        self.chain = RetrievalQA.from_chain_type(
-            llm=llm,
-            chain_type='stuff',
-            retriever=self.retriever,
-        )
+        self.chain: typing.Optional[Chain] = None
         self.trunk_size = settings.policy.trunk_size or 1000
         self.trunk_overlap = settings.policy.trunk_overlap or 0
 
@@ -128,13 +128,18 @@ class LCDocumentQAPolicy(ChatPolicy):
         )
         docsearch = Chroma.from_documents(texts, embeddings)
 
-        self.retriever = docsearch.as_retriever()
+        self.chain = RetrievalQA.from_chain_type(
+            llm=self.llm,
+            chain_type='stuff',
+            retriever=docsearch.as_retriever(),
+            return_source_documents=True,
+        )
 
     async def respond(
         self, *, conversation_id: str, message: RequestMessage
     ) -> ResponseMessage:
         if isinstance(message, TextRequestMessage):
-            if self.retriever is None:
+            if self.chain is None:
                 response = FallbackResponseMessage()
                 response.reason = 'Please upload the document first.'
             else:
