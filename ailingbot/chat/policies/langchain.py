@@ -1,6 +1,5 @@
 import copy
 import tempfile
-import typing
 import uuid
 
 from langchain import ConversationChain
@@ -83,10 +82,6 @@ class LCConversationChatPolicy(ChatPolicy):
         return response
 
 
-def from_chain_type(llm, chain_type, retriever, return_source_documents):
-    pass
-
-
 class LCDocumentQAPolicy(ChatPolicy):
     """Question-Answering based on documents."""
 
@@ -101,14 +96,14 @@ class LCDocumentQAPolicy(ChatPolicy):
 
         llm_config = copy.deepcopy(settings.policy.llm)
         self.llm = load_llm_from_config(llm_config)
-        self.retriever: typing.Optional[VectorStoreRetriever] = None
-        self.chain: typing.Optional[Chain] = None
+        self.chains: dict[str, Chain] = {}
         self.trunk_size = settings.policy.trunk_size or 1000
         self.trunk_overlap = settings.policy.trunk_overlap or 0
 
+    @staticmethod
     def _build_documents_index(
-        self, *, content: bytes, file_type: str
-    ) -> None:
+        *, content: bytes, file_type: str
+    ) -> VectorStoreRetriever:
         """Load document and build index."""
         if file_type.lower() != 'pdf':
             raise ailingbot.shared.errors.ChatPolicyError(
@@ -128,26 +123,28 @@ class LCDocumentQAPolicy(ChatPolicy):
         )
         docsearch = Chroma.from_documents(texts, embeddings)
 
-        self.chain = RetrievalQA.from_chain_type(
-            llm=self.llm,
-            chain_type='stuff',
-            retriever=docsearch.as_retriever(),
-            return_source_documents=True,
-        )
+        return docsearch.as_retriever()
 
     async def respond(
         self, *, conversation_id: str, message: RequestMessage
     ) -> ResponseMessage:
         if isinstance(message, TextRequestMessage):
-            if self.chain is None:
+            if conversation_id not in self.chains:
                 response = FallbackResponseMessage()
                 response.reason = 'Please upload the document first.'
             else:
                 response = TextResponseMessage()
-                response.text = await self.chain.arun(message.text)
+                response.text = await self.chains[conversation_id].arun(
+                    message.text
+                )
         elif isinstance(message, FileRequestMessage):
-            self._build_documents_index(
-                content=message.content, file_type=message.file_type
+            self.chains[conversation_id] = RetrievalQA.from_chain_type(
+                llm=self.llm,
+                chain_type='stuff',
+                retriever=self._build_documents_index(
+                    content=message.content, file_type=message.file_type
+                ),
+                return_source_documents=False,
             )
             response = TextResponseMessage()
             response.text = f'I am ready! Please ask questions regarding the content of {message.file_name}.'
