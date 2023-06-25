@@ -20,6 +20,3 @@ COPY ./ ./
 
 # Install dependencies
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
-
-# Create settings.toml
-RUN poetry run ailingbot init --silence --overwrite

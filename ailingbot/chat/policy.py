@@ -45,6 +45,12 @@ class ChatPolicy(AbstractAsyncComponent, abc.ABC):
             )
 
             instance = LCConversationChatPolicy(debug=debug)
+        elif name.lower() == 'lc_document_qa':
+            from ailingbot.chat.policies.langchain import (
+                LCDocumentQAPolicy,
+            )
+
+            instance = LCDocumentQAPolicy(debug=debug)
         else:
             instance = get_class_dynamically(name)(debug=debug)
 

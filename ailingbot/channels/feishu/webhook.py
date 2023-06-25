@@ -10,7 +10,12 @@ from starlette.background import BackgroundTasks
 
 from ailingbot.brokers.broker import MessageBroker
 from ailingbot.channels.channel import ChannelWebhookFactory
-from ailingbot.chat.messages import TextRequestMessage, MessageScope
+from ailingbot.channels.feishu.agent import FeishuAgent
+from ailingbot.chat.messages import (
+    TextRequestMessage,
+    MessageScope,
+    FileRequestMessage,
+)
 from ailingbot.config import settings
 
 
@@ -78,8 +83,9 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
         async def shutdown() -> None:
             await self.broker.finalize()
 
-        async def _create_request_message_task(event: FeishuEventBody) -> None:
-            """Background task for creating request message from event."""
+        def _create_text_request_message(
+            event: FeishuEventBody,
+        ) -> TextRequestMessage:
             text = json.loads(event.event.message.content).get('text', '')
             text = ' '.join(
                 [
@@ -88,11 +94,43 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
                     if not x.strip().startswith('@_user_')
                 ]
             )
-            req_msg = TextRequestMessage(
-                uuid=event.event.message.message_id,
+            return TextRequestMessage(
                 text=text,
-                sender_id=event.event.sender.sender_id.get('open_id', ''),
             )
+
+        async def _create_file_request_message(
+            event: FeishuEventBody,
+        ) -> FileRequestMessage:
+            content = json.loads(event.event.message.content)
+            file_key = content.get('file_key', '')
+            file_name = content.get('file_name', '')
+
+            feishu = FeishuAgent()
+            content = await feishu.get_resource_from_message(
+                event.event.message.message_id, file_key, 'file'
+            )
+            if len(file_name.split('.')) >= 2:
+                file_type = file_name.split('.')[-1].strip().lower()
+            else:
+                file_type = ''
+
+            return FileRequestMessage(
+                content=content,
+                file_type=file_type,
+                file_name=file_name,
+            )
+
+        async def _create_request_message_task(event: FeishuEventBody) -> None:
+            """Background task for creating request message from event."""
+            if event.event.message.message_type == 'text':
+                req_msg = _create_text_request_message(event)
+            elif event.event.message.message_type == 'file':
+                req_msg = await _create_file_request_message(event)
+            else:
+                return
+
+            req_msg.uuid = event.event.message.message_id
+            req_msg.sender_id = event.event.sender.sender_id.get('open_id', '')
             if event.event.message.chat_type == 'p2p':
                 req_msg.scope = MessageScope.USER
             elif event.event.message.chat_type == 'group':
@@ -131,12 +169,12 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
                 )
             if event.header.event_type != 'im.message.receive_v1':
                 raise HTTPException(
-                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail='Event type is not supported.',
                 )
-            if event.event.message.message_type != 'text':
+            if event.event.message.message_type not in ['text', 'file']:
                 raise HTTPException(
-                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail='Message type is not supported.',
                 )
 

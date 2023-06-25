@@ -3,6 +3,11 @@ version: "3"
 services:
   rabbit:
     image: rabbitmq:3
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
   bot:
     build:
       context: .
@@ -10,7 +15,14 @@ services:
     depends_on:
       - rabbit
     environment:
+      AILINGBOT_BROKER__NAME: pika
       AILINGBOT_BROKER__HOST: rabbit
+      AILINGBOT_BROKER__TIMEOUT: 60
+      AILINGBOT_POLICY__NAME: lc_conversation
+      AILINGBOT_POLICY__HISTORY_SIZE: 5
+      AILINGBOT_POLICY__LLM___TYPE: openai
+      AILINGBOT_POLICY__LLM__MODEL_NAME: gpt-3.5-turbo
+      AILINGBOT_POLICY__LLM__TEMPERATURE: 0
       AILINGBOT_POLICY__LLM__OPENAI_API_KEY: ${AILINGBOT_POLICY__LLM__OPENAI_API_KEY}
     restart: unless-stopped
     command: poetry run ailingbot bot serve
@@ -21,7 +33,9 @@ services:
     depends_on:
       - rabbit
     environment:
+      AILINGBOT_BROKER__NAME: pika
       AILINGBOT_BROKER__HOST: rabbit
+      AILINGBOT_BROKER__TIMEOUT: 60
       AILINGBOT_CHANNEL__NAME: ${AILINGBOT_CHANNEL__NAME}
       AILINGBOT_CHANNEL__CORPID: ${AILINGBOT_CHANNEL__CORPID}
       AILINGBOT_CHANNEL__CORPSECRET: ${AILINGBOT_CHANNEL__CORPSECRET}
@@ -39,10 +53,14 @@ services:
     depends_on:
       - rabbit
     environment:
+      AILINGBOT_BROKER__NAME: pika
       AILINGBOT_BROKER__HOST: rabbit
+      AILINGBOT_BROKER__TIMEOUT: 60
       AILINGBOT_CHANNEL__NAME: ${AILINGBOT_CHANNEL__NAME}
       AILINGBOT_CHANNEL__TOKEN: ${AILINGBOT_CHANNEL__TOKEN}
       AILINGBOT_CHANNEL__AES_KEY: ${AILINGBOT_CHANNEL__AES_KEY}
       AILINGBOT_CHANNEL__VERIFICATION_TOKEN: ${AILINGBOT_CHANNEL__VERIFICATION_TOKEN}
+      AILINGBOT_UVICORN_HOST: "0.0.0.0"
+      AILINGBOT_UVICORN_PORT: 8080
     restart: unless-stopped
     command: poetry run ailingbot channel serve_webhook

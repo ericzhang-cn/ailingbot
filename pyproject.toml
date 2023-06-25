@@ -27,10 +27,12 @@ asgiref = "^3.5.2"
 tabulate = { version = "^0.9.0", extras = ["widechars"] }
 emoji = "^2.2.0"
 prompt-toolkit = "^3.0.33"
-langchain = "^0.0.192"
+langchain = "^0.0.214"
 openai = "^0.27.8"
 rich = "^13.4.2"
 tomlkit = "^0.11.8"
+chromadb = "^0.3.26"
+pypdf = "^3.11.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"

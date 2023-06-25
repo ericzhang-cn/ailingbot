@@ -35,6 +35,14 @@ class TextRequestMessage(RequestMessage):
     text: str = ''
 
 
+class FileRequestMessage(RequestMessage):
+    """File request message."""
+
+    content: bytes
+    file_type: str
+    file_name: str
+
+
 class InputRequestMessage(RequestMessage):
     """Input request message."""
 

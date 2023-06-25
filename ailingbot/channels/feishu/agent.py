@@ -143,3 +143,20 @@ class FeishuAgent(ChannelAgent):
         else:
             body['receive_id'] = message.receiver_id
             await self._send(receive_id_type=receive_id_type, body=body)
+
+    async def get_resource_from_message(
+        self, message_id: str, file_key: str, resource_type: str
+    ) -> bytes:
+        """Get file or image resource from message."""
+        access_token = await self._get_access_token()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f'https://open.feishu.cn/open-apis/im/v1/messages/{message_id}/resources/{file_key}',
+                headers={
+                    'Authorization': f'Bearer {access_token}',
+                },
+                params={'type': resource_type},
+            ) as response:
+                if not response.ok:
+                    response.raise_for_status()
+                return await response.content.read()
