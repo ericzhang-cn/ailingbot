@@ -6,7 +6,7 @@
   <img src="./img/logo.png" alt="AilingBot" width="300">
 </p>
 
-<p style="text-align: center"><b>AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。</b></p>
+<p align="center"><b>AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。</b></p>
 
 # 特点
 
