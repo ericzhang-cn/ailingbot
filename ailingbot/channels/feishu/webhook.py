@@ -8,9 +8,9 @@ from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
 from starlette.background import BackgroundTasks
 
-from ailingbot.brokers.broker import MessageBroker
 from ailingbot.channels.channel import ChannelWebhookFactory
 from ailingbot.channels.feishu.agent import FeishuAgent
+from ailingbot.chat.chatbot import ChatBot
 from ailingbot.chat.messages import (
     TextRequestMessage,
     MessageScope,
@@ -68,20 +68,48 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
 
         self.verification_token = settings.channel.verification_token
 
-        self.broker: typing.Optional[MessageBroker] = None
         self.app: typing.Optional[ASGIApplication | typing.Callable] = None
+        self.agent: typing.Optional[FeishuAgent] = None
+        self.bot: typing.Optional[ChatBot] = None
 
     async def create_webhook_app(self) -> ASGIApplication | typing.Callable:
-        self.broker = MessageBroker.get_broker(settings.broker.name)
         self.app = FastAPI()
+        self.agent = FeishuAgent()
+        self.bot = ChatBot(debug=self.debug)
+
+        async def _chat_task(
+            conversation_id: str, event: FeishuEventBody
+        ) -> None:
+            """Send a request message to the bot, receive a response message, and send it back to the user."""
+            if event.event.message.message_type == 'text':
+                req_msg = _create_text_request_message(event)
+            elif event.event.message.message_type == 'file':
+                req_msg = await _create_file_request_message(event)
+            else:
+                return
+
+            req_msg.uuid = event.event.message.message_id
+            req_msg.sender_id = event.event.sender.sender_id.get('open_id', '')
+            if event.event.message.chat_type == 'p2p':
+                req_msg.scope = MessageScope.USER
+            elif event.event.message.chat_type == 'group':
+                req_msg.scope = MessageScope.GROUP
+                req_msg.meta['chat_id'] = event.event.message.chat_id
+
+            response = await self.bot.chat(
+                conversation_id=conversation_id, message=req_msg
+            )
+            await self.agent.send_message(response)
 
         @self.app.on_event('startup')
         async def startup() -> None:
-            await self.broker.initialize()
+            await self.agent.initialize()
+            await self.bot.initialize()
 
         @self.app.on_event('shutdown')
         async def shutdown() -> None:
-            await self.broker.finalize()
+            await self.agent.finalize()
+            await self.bot.finalize()
 
         def _create_text_request_message(
             event: FeishuEventBody,
@@ -119,25 +147,6 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
                 file_type=file_type,
                 file_name=file_name,
             )
-
-        async def _create_request_message_task(event: FeishuEventBody) -> None:
-            """Background task for creating request message from event."""
-            if event.event.message.message_type == 'text':
-                req_msg = _create_text_request_message(event)
-            elif event.event.message.message_type == 'file':
-                req_msg = await _create_file_request_message(event)
-            else:
-                return
-
-            req_msg.uuid = event.event.message.message_id
-            req_msg.sender_id = event.event.sender.sender_id.get('open_id', '')
-            if event.event.message.chat_type == 'p2p':
-                req_msg.scope = MessageScope.USER
-            elif event.event.message.chat_type == 'group':
-                req_msg.scope = MessageScope.GROUP
-                req_msg.meta['chat_id'] = event.event.message.chat_id
-
-            await self.broker.produce_request(req_msg)
 
         @self.app.post(
             '/webhook/feishu/event/', status_code=status.HTTP_200_OK
@@ -178,7 +187,9 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
                     detail='Message type is not supported.',
                 )
 
-            background_tasks.add_task(_create_request_message_task, event)
+            background_tasks.add_task(
+                _chat_task, event.event.message.chat_id, event
+            )
 
             return {}
 

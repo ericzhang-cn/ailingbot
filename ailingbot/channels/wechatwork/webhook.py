@@ -5,40 +5,58 @@ from urllib import parse
 
 import xmltodict
 from asgiref.typing import ASGIApplication
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, status, HTTPException, BackgroundTasks
 from fastapi.requests import Request
 from fastapi.responses import PlainTextResponse
 
-from ailingbot.brokers.broker import MessageBroker
 from ailingbot.channels.channel import ChannelWebhookFactory
+from ailingbot.channels.wechatwork.agent import WechatworkAgent
 from ailingbot.channels.wechatwork.encrypt import signature, decrypt
-from ailingbot.chat.messages import TextRequestMessage, MessageScope
+from ailingbot.chat.chatbot import ChatBot
+from ailingbot.chat.messages import (
+    TextRequestMessage,
+    MessageScope,
+    RequestMessage,
+)
 from ailingbot.config import settings
 
 
 class WechatworkWebhookFactory(ChannelWebhookFactory):
     """Factory that creates wechatwork webhook ASGI application."""
 
-    def __init__(self):
-        super(WechatworkWebhookFactory, self).__init__()
+    def __init__(self, debug: bool = False):
+        super(WechatworkWebhookFactory, self).__init__(debug=debug)
 
         self.token = settings.channel.token
         self.aes_key = settings.channel.aes_key
 
-        self.broker: typing.Optional[MessageBroker] = None
         self.app: typing.Optional[ASGIApplication | typing.Callable] = None
+        self.agent: typing.Optional[WechatworkAgent] = None
+        self.bot: typing.Optional[ChatBot] = None
 
     async def create_webhook_app(self) -> ASGIApplication | typing.Callable:
-        self.broker = MessageBroker.get_broker(settings.broker.name)
         self.app = FastAPI()
+        self.agent = WechatworkAgent()
+        self.bot = ChatBot(debug=self.debug)
+
+        async def _chat_task(
+            conversation_id: str, message: RequestMessage
+        ) -> None:
+            """Send a request message to the bot, receive a response message, and send it back to the user."""
+            response = await self.bot.chat(
+                conversation_id=conversation_id, message=message
+            )
+            await self.agent.send_message(response)
 
         @self.app.on_event('startup')
         async def startup() -> None:
-            await self.broker.initialize()
+            await self.agent.initialize()
+            await self.bot.initialize()
 
         @self.app.on_event('shutdown')
         async def shutdown() -> None:
-            await self.broker.finalize()
+            await self.agent.finalize()
+            await self.bot.finalize()
 
         @self.app.get(
             '/webhook/wechatwork/event/',
@@ -84,7 +102,11 @@ class WechatworkWebhookFactory(ChannelWebhookFactory):
             '/webhook/wechatwork/event/', status_code=status.HTTP_200_OK
         )
         async def handle_event(
-            msg_signature: str, timestamp: int, nonce: int, request: Request
+            msg_signature: str,
+            timestamp: int,
+            nonce: int,
+            request: Request,
+            background_tasks: BackgroundTasks,
         ) -> dict:
             """Handle the event request from Wechatwork.
 
@@ -96,6 +118,8 @@ class WechatworkWebhookFactory(ChannelWebhookFactory):
             :type nonce: int
             :param request: Http request.
             :type request: Request
+            :param background_tasks:
+            :type background_tasks:
             :return: Empty dict.
             :rtype: dict
             """
@@ -134,7 +158,9 @@ class WechatworkWebhookFactory(ChannelWebhookFactory):
                 )
 
             if req_msg:
-                await self.broker.produce_request(req_msg)
+                background_tasks.add_task(
+                    _chat_task, req_msg.sender_id, req_msg
+                )
 
             return {}
 
