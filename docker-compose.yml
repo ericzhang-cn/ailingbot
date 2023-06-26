@@ -21,4 +21,4 @@ services:
       AILINGBOT_UVICORN_PORT: 8080
       AILINGBOT_POLICY__LLM__OPENAI_API_KEY: ${AILINGBOT_POLICY__LLM__OPENAI_API_KEY}
     restart: unless-stopped
-    command: poetry run ailingbot channel serve
+    command: poetry run ailingbot serve
