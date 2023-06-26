@@ -17,8 +17,8 @@ from prompt_toolkit.formatted_text import FormattedText
 from rich.console import Console
 
 import ailingbot.shared.errors
-from ailingbot.channels.channel import ChannelAgent, ChannelWebhookFactory
-from ailingbot.chat.chatbot import ChatBot, BotRunMode
+from ailingbot.channels.channel import ChannelWebhookFactory
+from ailingbot.chat.chatbot import ChatBot
 from ailingbot.chat.messages import (
     TextRequestMessage,
     FallbackResponseMessage,
@@ -74,63 +74,12 @@ def command_line_tools():
     pass
 
 
-@command_line_tools.group(name='bot', help='Bot commands.')
-def bot_group():
-    """Bot commands."""
-    pass
-
-
-@bot_group.command(
-    name='serve', help='Run chatbot task(s) to serve request messages.'
-)
-@click.option(
-    '-n',
-    '--number-of-tasks',
-    default=1,
-    show_default=True,
-    type=click.IntRange(min=1),
-    help='Number of concurrently executed tasks.',
-)
-@click.option('--debug', is_flag=True, help='Enable debug mode.')
-@options.log_level_option
-@options.log_file_option
-def bot_serve(
-    number_of_tasks: int,
-    debug: bool,
-    log_level: str,
-    log_file: str,
-):
-    """Run chatbot task(s) to serve request messages.
-
-    :param number_of_tasks: Number of concurrently executed tasks.
-    :type number_of_tasks: int
-    :param debug: Whether to enable debug mode.
-    :type debug: bool
-    :param log_level:
-    :type log_level:
-    :param log_file:
-    :type log_file:
-    """
-    _set_logger(sink=log_file, level=log_level)
-
-    chatbot = ChatBot(
-        num_of_tasks=number_of_tasks,
-        run_mode=BotRunMode.Broker,
-        debug=debug,
-    )
-
-    try:
-        chatbot.run()
-    except ailingbot.shared.errors.AilingBotError as e:
-        raise click.ClickException(e.reason)
-
-
-@bot_group.command(
+@command_line_tools.command(
     name='chat', help='Start an interactive bot conversation environment.'
 )
 @click.option('--debug', is_flag=True, help='Enable debug mode.')
 @_coro_cmd
-async def bot_chat(
+async def chat(
     debug: bool,
 ):
     """Start an interactive bot conversation environment.
@@ -139,11 +88,10 @@ async def bot_chat(
     :type debug: bool
     """
     chatbot = ChatBot(
-        run_mode=BotRunMode.Standalone,
         debug=debug,
     )
     try:
-        await chatbot.startup()
+        await chatbot.initialize()
     except ailingbot.shared.errors.AilingBotError as e:
         raise click.ClickException(e.reason)
 
@@ -181,7 +129,7 @@ async def bot_chat(
 
         # Sends request and processes different types response.
         try:
-            response = await chatbot.respond(
+            response = await chatbot.chat(
                 conversation_id=conversation_id, message=request
             )
             request = None
@@ -213,59 +161,13 @@ async def bot_chat(
                 await render(response)
 
 
-@command_line_tools.group(name='channel', help='Channel commands.')
-def channel_group():
-    """Channel commands."""
-    pass
-
-
-@channel_group.command(
-    name='serve_agent',
-    help='Run channel agent task(s) to serve response messages.',
-)
-@click.option(
-    '-n',
-    '--number-of-tasks',
-    default=1,
-    show_default=True,
-    type=click.IntRange(min=1),
-    help='Number of concurrently executed tasks.',
-)
-@options.log_level_option
-@options.log_file_option
-def channel_serve_agent(
-    number_of_tasks: int,
-    log_level: str,
-    log_file: str,
-):
-    """Run channel agent task(s) to serve response messages.
-
-    :param number_of_tasks: Number of concurrently executed tasks.
-    :type number_of_tasks: int
-    :param log_level:
-    :type log_level:
-    :param log_file:
-    :type log_file:
-    """
-    _set_logger(sink=log_file, level=log_level)
-
-    agent = ChannelAgent.get_agent(
-        settings.channel.name,
-        num_of_tasks=number_of_tasks,
-    )
-    try:
-        agent.run()
-    except ailingbot.shared.errors.AilingBotError as e:
-        raise click.ClickException(e.reason)
-
-
-@channel_group.command(
-    name='serve_webhook', help='Run webhook server to receive events.'
+@command_line_tools.command(
+    name='serve', help='Run webhook server to receive events.'
 )
 @options.log_level_option
 @options.log_file_option
 @_coro_cmd
-async def channel_serve_webhook(
+async def serve(
     log_level: str,
     log_file: str,
 ):
@@ -278,14 +180,8 @@ async def channel_serve_webhook(
     await server.serve()
 
 
-@command_line_tools.group(name='config', help='Configuration commands.')
-def config_group():
-    """Configuration commands."""
-    pass
-
-
-@config_group.command(
-    name='show', help='Show current configuration information.'
+@command_line_tools.command(
+    name='config', help='Show current configuration information.'
 )
 @click.option(
     '-k',
@@ -335,7 +231,6 @@ async def init(silence: bool, overwrite: bool):
         'lang': 'zh_CN',
         'tz': 'Asia/Shanghai',
         'policy': {},
-        'broker': {},
         'channel': {},
         'uvicorn': {
             'host': '0.0.0.0',
@@ -352,15 +247,6 @@ async def init(silence: bool, overwrite: bool):
                 'openai_api_key': '',
                 'temperature': 0,
             },
-        }
-        config['broker'] = {
-            'name': 'pika',
-            'host': 'localhost',
-            'port': 5672,
-            'user': '',
-            'password': '',
-            'timeout': 5,
-            'queue_name_prefix': '',
         }
         config['channel'] = {
             'name': 'wechatwork',
@@ -392,22 +278,6 @@ async def init(silence: bool, overwrite: bool):
                     'openai_api_key': '',
                     'temperature': 0,
                 },
-            }
-
-        broker = await display_radio_prompt(
-            title='Select broker:',
-            values=[(x, x) for x in ['pika', 'Configure Later']],
-            cancel_value='Configure Later',
-        )
-        if broker == 'pika':
-            config['broker'] = {
-                'name': 'pika',
-                'host': 'localhost',
-                'port': 5672,
-                'user': '',
-                'password': '',
-                'timeout': 5,
-                'queue_name_prefix': '',
             }
 
         channel = await display_radio_prompt(

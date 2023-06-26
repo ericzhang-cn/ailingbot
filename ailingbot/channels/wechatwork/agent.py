@@ -15,15 +15,9 @@ from ailingbot.shared.errors import ExternalHTTPAPIError
 class WechatworkAgent(ChannelAgent):
     """Wechatwork channel agent class."""
 
-    def __init__(
-        self,
-        *,
-        num_of_tasks: int = 1,
-    ):
+    def __init__(self):
         """Initializes class."""
-        super(WechatworkAgent, self).__init__(
-            num_of_tasks=num_of_tasks,
-        )
+        super(WechatworkAgent, self).__init__()
 
         self.corpid = settings.channel.corpid
         self.corpsecret = settings.channel.corpsecret

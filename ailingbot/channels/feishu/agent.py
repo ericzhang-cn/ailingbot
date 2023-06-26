@@ -16,15 +16,9 @@ from ailingbot.shared.errors import ExternalHTTPAPIError
 class FeishuAgent(ChannelAgent):
     """Feishu channel agent class."""
 
-    def __init__(
-        self,
-        *,
-        num_of_tasks: int = 1,
-    ):
+    def __init__(self):
         """Initializes class."""
-        super(FeishuAgent, self).__init__(
-            num_of_tasks=num_of_tasks,
-        )
+        super(FeishuAgent, self).__init__()
 
         self.app_id = settings.channel.app_id
         self.app_secret = settings.channel.app_secret
