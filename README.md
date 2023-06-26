@@ -3,7 +3,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 <p align="center">
-  <img src="./img/logo.png" alt="AilingBot" width="300">
+  <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/logo.png" alt="AilingBot" width="300">
 </p>
 
 <p align="center"><b>AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。</b></p>
@@ -36,7 +36,7 @@
 
 下面将看到如何通过AilingBot快速启动一个基于命令行界面的AI机器人，效果如图：
 <p align="center">
-    <img src="./img/command-line-screenshot.png" alt="命令行机器人"/>
+    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/command-line-screenshot.png" alt="命令行机器人"/>
 </p>
 
 
@@ -98,13 +98,14 @@ ailingbot chat
 git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
-docker run -it --rm \
+docker run -d \
   -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
   -e AILINGBOT_CHANNEL__CORPID={你的企业微信corpid} \
   -e AILINGBOT_CHANNEL__CORPSECRET={你的企业微信corpsecret} \
   -e AILINGBOT_CHANNEL__AGENTID={你的企业微信agentid} \
-  -e AILINGBOT_CHANNEL__TOEKN={你的企业微信webhook token} \
+  -e AILINGBOT_CHANNEL__TOKEN={你的企业微信webhook token} \
   -e AILINGBOT_CHANNEL__AES_KEY={你的企业微信webhook aes_key} \
+  -p 8080:8080
   ailingbot poetry run ailingbot serve
 ```
 
@@ -148,7 +149,7 @@ Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
 完成以上配置后，就可以在企业微信中找到机器人，进行对话了：
 
 <p align="center">
-    <img src="./img/wechatwork-screenshot.png" alt="企业微信机器人" width="300"/>
+    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/wechatwork-screenshot.png" alt="企业微信机器人" width="300"/>
 </p>
 
 # 发展计划
