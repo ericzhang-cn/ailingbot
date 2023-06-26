@@ -32,9 +32,9 @@ class LCConversationChatPolicy(ChatPolicy):
     """Having a direct conversation with a large language model."""
 
     def __init__(
-            self,
-            *,
-            debug: bool = False,
+        self,
+        *,
+        debug: bool = False,
     ):
         super(LCConversationChatPolicy, self).__init__(
             debug=debug,
@@ -61,7 +61,7 @@ class LCConversationChatPolicy(ChatPolicy):
         return self.memories[conversation_id]
 
     async def respond(
-            self, *, conversation_id: str, message: RequestMessage
+        self, *, conversation_id: str, message: RequestMessage
     ) -> ResponseMessage:
         if not isinstance(message, TextRequestMessage):
             response = FallbackResponseMessage()
@@ -86,9 +86,9 @@ class LCDocumentQAPolicy(ChatPolicy):
     """Question-Answering based on documents."""
 
     def __init__(
-            self,
-            *,
-            debug: bool = False,
+        self,
+        *,
+        debug: bool = False,
     ):
         super(LCDocumentQAPolicy, self).__init__(
             debug=debug,
@@ -101,7 +101,7 @@ class LCDocumentQAPolicy(ChatPolicy):
         self.chunk_overlap = settings.policy.chunk_overlap or 0
 
     def _build_documents_index(
-            self, *, content: bytes, file_type: str
+        self, *, content: bytes, file_type: str
     ) -> VectorStoreRetriever:
         """Load document and build index."""
         if file_type.lower() != 'pdf':
@@ -114,7 +114,9 @@ class LCDocumentQAPolicy(ChatPolicy):
             loader = PyPDFLoader(file_path=tf.name)
             documents = loader.load()
 
-        text_splitter = CharacterTextSplitter(chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
+        text_splitter = CharacterTextSplitter(
+            chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
+        )
         texts = text_splitter.split_documents(documents)
 
         embeddings = OpenAIEmbeddings(
@@ -125,7 +127,7 @@ class LCDocumentQAPolicy(ChatPolicy):
         return docsearch.as_retriever()
 
     async def respond(
-            self, *, conversation_id: str, message: RequestMessage
+        self, *, conversation_id: str, message: RequestMessage
     ) -> ResponseMessage:
         if isinstance(message, TextRequestMessage):
             if conversation_id not in self.chains:
