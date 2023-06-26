@@ -147,7 +147,7 @@ Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
 AilingBot的主要处理流程如下图：
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/flow.png" alt="主要流程" width="500"/>
+    <img src="./img/flow.png" alt="主要流程" width="500"/>
 </p>
 
 1. 首先用户将消息发送给IM的机器人
