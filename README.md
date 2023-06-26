@@ -1,81 +1,72 @@
-[🇨🇳简体中文](https://github.com/ericzhang-cn/ailingbot/blob/main/README_Chinese.md)
-
----
-
 ![Python package workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/python-package.yml/badge.svg)
 ![Pylint workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/pylint.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-<img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/logo.png" alt="logo" width="50" height="50"/>
+<div style="text-align:center">
+  <img src="./img/logo.png" alt="AilingBot" width="300">
+</div>
 
-AilingBot - An all-in-one solution to empower your IM bot with AI.
+<p style="text-align: center"><b>AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。</b></p>
 
-# Features
+# 特点
 
-- 💯**Open source & free**: Completely open source and free
-- 📦**Out-of-the-box**: No development required, pre-installed with the ability to integrate with existing mainstream IM
-  and LLM models
-- 🔗**Integrated with LangChain**: Integrated with LangChain's ability to directly use pre-installed Chains or Agents
-- 🧩**Modular**: The project is organized in a modular way, with modules depending on abstract protocols between them.
-  Similar modules can implement protocols and be used immediately
-- 💻**Scalable**: AilingBot's usage scenarios and capabilities can be expanded. For example, integrating with new IM, new
-  LLM, or developing your own Chain, Agent, and chat policy
-- 🚀**High performance**: AilingBot uses coroutine-based asynchronous mode to improve system's high concurrency
-  performance. At the same time, the core process can start multiple processes to further improve the system's high
-  concurrency processing capability
-- 🔌**Integrated through API**: AilingBot provides a set of clear API interfaces for easy integration and collaboration
-  with other systems and processes
+- 💯**开源&免费**：完全开源且免费
+- 📦**开箱即用**：无需开发，预置接入现有主流IM及AI模型的能力
+- 🔗**LangChain友好**：方便集成LangChain
+- 🧩**模块化**：项目采用模块化组织，模块之间通过抽象协议依赖，同类模块实现协议即可即插即用
+- 💻**可扩展**：可以扩展AilingBot的使用场景和能力。例如接入到新的IM，新的AI模型，或者定制自己的对话策略
+- 🚀**高性能**：AilingBot采用基于协程的异步模式，提高系统的高并发性能。同时可以通过多进程进一步提升系统的高并发处理能力
+- 🔌**通过API集成**：AilingBot提供一组清晰的API接口，方便与其他系统及流程集成协同
 
-# List of supported IMs
+# IM支持列表
 
-## Supported
+## 已支持
 
-- WeChat Work
-- Feishu
+- 企业微信
+- 飞书
 
-## Coming soon
+## 即将支持
 
-- DingTalk
+- 钉钉
 - Slack
 
-# Quick Start Guide
+# 快速使用指南
 
-## Start an AI chatbot in 5 minutes
+## 5分钟启动一个AI聊天机器人
 
-Below you will see how to quickly start a command-line-based AI chatbot through AilingBot, with the effect as shown in
-the figure:
-![Command-line robot](https://github.com/ericzhang-cn/ailingbot/raw/main/img/command-line-screenshot.png)
+下面将看到如何通过AilingBot快速启动一个基于命令行界面的AI机器人，效果如图：
+![命令行机器人](./img/command-line-screenshot.png)
 
 
-> 💡First, you need an OpenAI API key. If you don't have one, apply here: https://platform.openai.com/account/api-keys
+> 💡首先你需要有一个OpenAI API key。如果没有请到这里申请：https://platform.openai.com/account/api-keys
 
-### Through Docker
+### 通过Docker
 
 ```shell
 git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
-docker run -it --rm -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={Your OpenAI API key} ailingbot poetry run ailingbot bot chat
+docker run -it --rm \
+  -e  AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
+  ailingbot poetry run ailingbot chat
 ```
 
-### Through PIP
+### 通过PIP
 
-#### Install
+#### 安装
 
 ```shell
 pip install ailingbot
 ```
 
-#### Generate configuration file
+#### 生成配置文件
 
 ```shell
 ailingbot init --silence --overwrite
 ```
 
-At this point, a file called settings.toml will be created in the current directory, which is AilingBot's configuration
-file.
-Next, modify the necessary configurations. To start the robot, only one configuration is required. Find the following
-section in settings.toml:
+此时在当前目录会创建一个叫settings.toml的文件，这个文件就是AilingBot的配置文件。
+接下来修改必要配置，启动机器人只需一项配置，找到settings.toml中以下部分：
 
 ```toml
 [policy.llm]
@@ -85,37 +76,53 @@ openai_api_key = ""
 temperature = 0
 ```
 
-Change the value of `openai_api_key` to your real OpenAI API key.
+将其中`openai_api_key`的值改为你的真实OpenAI API key。
 
-#### Start the robot
+#### 启动机器人
 
-Start the robot with the following command:
-
-```shell
-ailingbot bot chat
-```
-
-## Integrating Instant Messaging Tools
-
-Here's how to quickly integrate the above robot into WeChat Work.
-
-### Through Docker
+通过如下命令启动机器人：
 
 ```shell
-export AILINGBOT_CHANNEL__AGENTID={Your Enterprise WeChat application AgentId}
-export AILINGBOT_CHANNEL__CORPSECRET={Your Enterprise WeChat application CorpSecret}
-export AILINGBOT_CHANNEL__AES_KEY={Your Enterprise WeChat application Webhook AES Key}
-export AILINGBOT_CHANNEL__CORPID={Your Enterprise WeChat application CorpId}
-export AILINGBOT_CHANNEL__TOKEN={Your Enterprise WeChat application Webhook Token}
-export AILINGBOT_POLICY__LLM__OPENAI_API_KEY={Your OpenAI API key}
-docker compose up
+ailingbot chat
 ```
 
-### Through PIP
+## 接入即时通讯工具
 
-#### Modify the configuration file
+下面演示如何快速将上面的机器人接入企业微信。
 
-Open `settings.toml` and fill in the following section with your Enterprise WeChat application's real information:
+### 通过Docker
+
+```shell
+git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
+cd ailingbot
+docker build -t ailingbot .
+docker run -it --rm \
+  -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
+  -e AILINGBOT_CHANNEL__CORPID={你的企业微信corpid} \
+  -e AILINGBOT_CHANNEL__CORPSECRET={你的企业微信corpsecret} \
+  -e AILINGBOT_CHANNEL__AGENTID={你的企业微信agentid} \
+  -e AILINGBOT_CHANNEL__TOEKN={你的企业微信webhook token} \
+  -e AILINGBOT_CHANNEL__AES_KEY={你的企业微信webhook aes_key} \
+  ailingbot poetry run ailingbot serve
+```
+
+### 通过PIP
+
+#### 安装
+
+```shell
+pip install ailingbot
+```
+
+#### 生成配置文件
+
+```shell
+ailingbot init --silence --overwrite
+```
+
+#### 修改配置文件
+
+打开`settings.toml`，将其中的下面部分填入你的企业微信应用真实信息：
 
 ```toml
 [channel]
@@ -127,28 +134,27 @@ token = ""
 aes_key = ""
 ```
 
-#### Start the service
+#### 启动服务
 
 ```shell
-ailingbot bot serve
-ailingbot bot channel serve_agent
-ailingbot bot channel serve_webhook
+ailingbot serve
 ```
 
-Finally, we need to go to the Enterprise WeChat management console to configure the webhook address so that Enterprise
-WeChat knows to forward the received user messages to our webhook.
-The URL of the webhook is: `http(s)://your_public_IP:8080/webhook/wechatwork/event/`
+最后我们需要去企业微信的管理后台，将webhook地址配置好，以便企业微信知道将接收到的用户消息转发到我们的webhook。
+Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
 
-After completing the above configuration, you can find the robot in Enterprise WeChat and start a conversation:
+完成以上配置后，就可以在企业微信中找到机器人，进行对话了：
 
-<img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/wechatwork-screenshot.png" alt="Enterprise WeChat robot" width="400"/>
+<div style="text-align: center">
+    <img src="./img/wechatwork-screenshot.png" alt="企业微信机器人" width="300"/>
+</div>
 
-# Roadmap
+# 发展计划
 
-- [ ] Provide complete usage and developer documentation
-- [ ] Support more IM clients, such as DingTalk, Slack, etc.
-- [ ] Support more commonly used LLM prompting paradigms and out-of-the-box chat policy
-- [ ] Provide support for common capabilities in LLM Chain, such as Vector Embedding&Query and Grounding
-- [ ] Provide a WebUI
-- [ ] Provide one-click deployment capability based on Docker containers
-- [ ] Enhance system observability and govern
+- [ ] 提供完善的使用文档和开发者文档
+- [ ] 支持更多的IM端，如钉钉、Slack等
+- [ ] 支持更多常用LLM prompting范式和开箱即用的对话策略
+- [ ] 对LLM Chain中的常用能力，如对Vector Embedding&Query和Grounding提供支持
+- [ ] 提供WebUI
+- [ ] 提供基于Docker容器的一键部署能力
+- [ ] 增强系统的可观测性和可治理性
