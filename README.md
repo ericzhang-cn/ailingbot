@@ -2,9 +2,9 @@
 ![Pylint workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/pylint.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-<div style="text-align:center">
+<p align="center">
   <img src="./img/logo.png" alt="AilingBot" width="300">
-</div>
+</p>
 
 <p style="text-align: center"><b>AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。</b></p>
 
@@ -35,7 +35,9 @@
 ## 5分钟启动一个AI聊天机器人
 
 下面将看到如何通过AilingBot快速启动一个基于命令行界面的AI机器人，效果如图：
-![命令行机器人](./img/command-line-screenshot.png)
+<p align="center">
+    <img src="./img/command-line-screenshot.png" alt="命令行机器人"/>
+</p>
 
 
 > 💡首先你需要有一个OpenAI API key。如果没有请到这里申请：https://platform.openai.com/account/api-keys
@@ -145,9 +147,9 @@ Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
 
 完成以上配置后，就可以在企业微信中找到机器人，进行对话了：
 
-<div style="text-align: center">
+<p align="center">
     <img src="./img/wechatwork-screenshot.png" alt="企业微信机器人" width="300"/>
-</div>
+</p>
 
 # 发展计划
 
