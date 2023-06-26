@@ -8,7 +8,7 @@
 
 <img src="https://github.com/ericzhang-cn/ailingbot/raw/main/img/logo.png" alt="logo" width="50" height="50"/>
 
-AilingBot - An all-in-one solution to empower your IM bot with LLM.
+AilingBot - An all-in-one solution to empower your IM bot with AI.
 
 # Features
 
