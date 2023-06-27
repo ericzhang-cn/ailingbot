@@ -234,7 +234,7 @@ ailingbot serve
 完成以上配置后，就可以在飞书中找到机器人，进行对话了：
 
 <p align="center">
-    <img src="./img/feishu-screenshot.png" alt="企业微信机器人" width="600"/>
+    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/feishu-screenshot.png" alt="企业微信机器人" width="1000"/>
 </p>
 
 # 📖使用指南
