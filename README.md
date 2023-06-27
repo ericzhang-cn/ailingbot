@@ -28,7 +28,7 @@
 </p>
 
 
-> 💡首先你需要有一个OpenAI API key。如果没有请到这里申请：https://platform.openai.com/account/api-keys
+> 💡首先你需要有一个OpenAI API key。如果没有参考互联网上相关资料获取
 
 ### 通过Docker
 
@@ -76,7 +76,7 @@ temperature = 0
 ailingbot chat
 ```
 
-## 接入即时通讯工具
+## 接入企业微信
 
 下面演示如何快速将上面的机器人接入企业微信。
 
@@ -87,12 +87,15 @@ git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
 docker run -d \
+  -e AILINGBOT_POLICY__NAME=lc_conversation \
+  -e AILINGBOT_POLICY__HISTORY_SIZE=5 \
   -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
-  -e AILINGBOT_CHANNEL__CORPID={你的企业微信corpid} \
-  -e AILINGBOT_CHANNEL__CORPSECRET={你的企业微信corpsecret} \
-  -e AILINGBOT_CHANNEL__AGENTID={你的企业微信agentid} \
-  -e AILINGBOT_CHANNEL__TOKEN={你的企业微信webhook token} \
-  -e AILINGBOT_CHANNEL__AES_KEY={你的企业微信webhook aes_key} \
+  -e AILINGBOT_CHANNEL__NAME=wechatwork \
+  -e AILINGBOT_CHANNEL__CORPID={你的企业微信机器人corpid} \
+  -e AILINGBOT_CHANNEL__CORPSECRET={你的企业微信机器人corpsecret} \
+  -e AILINGBOT_CHANNEL__AGENTID={你的企业微信机器人agentid} \
+  -e AILINGBOT_CHANNEL__TOKEN={你的企业微信机器人webhook token} \
+  -e AILINGBOT_CHANNEL__AES_KEY={你的企业微信机器人webhook aes_key} \
   -p 8080:8080
   ailingbot poetry run ailingbot serve
 ```
@@ -118,11 +121,21 @@ ailingbot init --silence --overwrite
 ```toml
 [channel]
 name = "wechatwork"
-corpid = ""
-corpsecret = ""
-agentid = 0
-token = ""
-aes_key = ""
+corpid = "" # 填写真实信息
+corpsecret = "" # 填写真实信息
+agentid = 0 # 填写真实信息
+token = "" # 填写真实信息
+aes_key = "" # 填写真实信息
+```
+
+在llm中填入你的OpenAI API Key：
+
+```toml
+[policy.llm]
+_type = "openai"
+model_name = "gpt-3.5-turbo"
+openai_api_key = "" # 这里填入真实OpenAI API Key
+temperature = 0
 ```
 
 #### 启动服务
@@ -138,6 +151,90 @@ Webhook的URL为：`http(s)://你的公网IP:8080/webhook/wechatwork/event/`
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/wechatwork-screenshot.png" alt="企业微信机器人" width="300"/>
+</p>
+
+## 接入飞书
+
+下面演示如何快速将上面的机器人接入飞书，并启用一个新的对话策略：上传文档并针对文档进行知识问答。
+
+### 通过Docker
+
+```shell
+git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
+cd ailingbot
+docker build -t ailingbot .
+docker run -d \
+  -e AILINGBOT_POLICY__NAME=lc_document_qa \
+  -e AILINGBOT_POLICY__CHUNK_SIZE=1000 \
+  -e AILINGBOT_POLICY__CHUNK_OVERLAP=0 \
+  -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
+  -e AILINGBOT_POLICY__LLM__MODEL_NAME=gpt-3.5-turbo-16k \
+  -e AILINGBOT_CHANNEL__NAME=feishu \
+  -e AILINGBOT_CHANNEL__APP_ID={你的飞书机器人app id} \
+  -e AILINGBOT_CHANNEL__APP_SECRET={你的飞书机器人app secret} \
+  -e AILINGBOT_CHANNEL__VERIFICATION_TOKEN={你的飞书机器人webhook verification token} \
+  -p 8080:8080
+  ailingbot poetry run ailingbot serve
+```
+
+### 通过PIP
+
+#### 安装
+
+```shell
+pip install ailingbot
+```
+
+#### 生成配置文件
+
+```shell
+ailingbot init --silence --overwrite
+```
+
+#### 修改配置文件
+
+打开`settings.toml`，将其中的channel部分改为如下，并填入你的飞书真实信息：
+
+```toml
+[channel]
+name = "feishu"
+app_id = "" # 填写真实信息
+app_secret = "" # 填写真实信息
+verification_token = "" # 填写真实信息
+```
+
+将policy部分替换为文档问答策略：
+
+```toml
+[policy]
+name = "lc_document_qa"
+chunk_size = 1000
+chunk_overlap = 5
+```
+
+最后建议在使用文档问答策略时，使用16k模型，因此将`policy.llm.model_name`修改为如下配置：
+
+```toml
+[policy.llm]
+_type = "openai"
+model_name = "gpt-3.5-turbo-16k" # 这里改为gpt-3.5-turbo-16k
+openai_api_key = "" # 填写真实信息
+temperature = 0
+```
+
+#### 启动服务
+
+```shell
+ailingbot serve
+```
+
+最后我们需要去飞书的管理后台，将webhook地址配置好。
+飞书Webhook的URL为：`http(s)://你的公网IP:8080/webhook/feishu/event/`
+
+完成以上配置后，就可以在飞书中找到机器人，进行对话了：
+
+<p align="center">
+    <img src="./img/feishu-screenshot.png" alt="企业微信机器人" width="600"/>
 </p>
 
 # 📖使用指南
@@ -449,6 +546,8 @@ TBD
 - [ ] 支持更多的IM端，如钉钉、Slack等
 - [ ] 开发更多的开箱即用的对话策略
 - [ ] 对向量数据库等基础组件做更完善的自持，并自持Grounding能力
-- [ ] 提供API及WebUI
+- [ ] 支持通过API调用
+- [ ] Web管理后台及可视化配置管理
 - [ ] 提供基于Docker容器的一键部署能力
 - [ ] 增强系统的可观测性和可治理性
+- [ ] 完善的测试用例
