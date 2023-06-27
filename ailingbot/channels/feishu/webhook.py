@@ -4,6 +4,7 @@ import json
 import typing
 
 from asgiref.typing import ASGIApplication
+from cachetools import TTLCache
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
 from starlette.background import BackgroundTasks
@@ -71,16 +72,22 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
         self.app: typing.Optional[ASGIApplication | typing.Callable] = None
         self.agent: typing.Optional[FeishuAgent] = None
         self.bot: typing.Optional[ChatBot] = None
+        self.event_id_cache: typing.Optional[TTLCache] = None
 
     async def create_webhook_app(self) -> ASGIApplication | typing.Callable:
         self.app = FastAPI()
         self.agent = FeishuAgent()
         self.bot = ChatBot(debug=self.debug)
+        self.event_id_cache = TTLCache(maxsize=1024, ttl=120)
 
         async def _chat_task(
             conversation_id: str, event: FeishuEventBody
         ) -> None:
             """Send a request message to the bot, receive a response message, and send it back to the user."""
+            if event.header.event_id in self.event_id_cache:
+                return
+            self.event_id_cache[event.header.event_id] = True
+
             if event.event.message.message_type == 'text':
                 req_msg = _create_text_request_message(event)
             elif event.event.message.message_type == 'file':

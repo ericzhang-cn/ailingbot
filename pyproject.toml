@@ -32,6 +32,7 @@ chromadb = "^0.3.26"
 pypdf = "^3.11.0"
 tiktoken = "^0.4.0"
 sqlalchemy = "^2.0.17"
+cachetools = "^5.3.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"

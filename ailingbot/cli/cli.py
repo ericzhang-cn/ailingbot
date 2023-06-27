@@ -80,7 +80,7 @@ def command_line_tools():
 @click.option('--debug', is_flag=True, help='Enable debug mode.')
 @_coro_cmd
 async def chat(
-        debug: bool,
+    debug: bool,
 ):
     """Start an interactive bot conversation environment.
 
@@ -168,8 +168,8 @@ async def chat(
 @options.log_file_option
 @_coro_cmd
 async def serve(
-        log_level: str,
-        log_file: str,
+    log_level: str,
+    log_file: str,
 ):
     _set_logger(sink=log_file, level=log_level)
 
@@ -190,7 +190,7 @@ async def serve(
     help='Configuration key.',
 )
 def config_show(
-        config_key: str,
+    config_key: str,
 ):
     console = Console()
     if config_key is None:
