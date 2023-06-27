@@ -80,7 +80,7 @@ def command_line_tools():
 @click.option('--debug', is_flag=True, help='Enable debug mode.')
 @_coro_cmd
 async def chat(
-    debug: bool,
+        debug: bool,
 ):
     """Start an interactive bot conversation environment.
 
@@ -168,8 +168,8 @@ async def chat(
 @options.log_file_option
 @_coro_cmd
 async def serve(
-    log_level: str,
-    log_file: str,
+        log_level: str,
+        log_file: str,
 ):
     _set_logger(sink=log_file, level=log_level)
 
@@ -190,7 +190,7 @@ async def serve(
     help='Configuration key.',
 )
 def config_show(
-    config_key: str,
+        config_key: str,
 ):
     console = Console()
     if config_key is None:
@@ -263,6 +263,7 @@ async def init(silence: bool, overwrite: bool):
                 (x, x)
                 for x in [
                     'lc_conversation',
+                    'lc_document_qa',
                     'Configure Later',
                 ]
             ],
@@ -274,7 +275,19 @@ async def init(silence: bool, overwrite: bool):
                 'history_size': 5,
                 'llm': {
                     '_type': 'openai',
-                    'model_name': 'gpt-3.5-turbo',
+                    'model_name': 'gpt-3.5-turbo-16k',
+                    'openai_api_key': '',
+                    'temperature': 0,
+                },
+            }
+        elif policy == 'lc_document_qa':
+            config['policy'] = {
+                'name': 'lc_document_qa',
+                'chunk_size': 1000,
+                'chunk_overlap': 0,
+                'llm': {
+                    '_type': 'openai',
+                    'model_name': 'gpt-3.5-turbo-16k',
                     'openai_api_key': '',
                     'temperature': 0,
                 },

@@ -181,19 +181,56 @@ AilingBot的配置可以通过两种方式：
 
 > 💡配置文件和环境变量可以混合使用，当一个配置项同时存在于两者时，优先使用环境变量
 
+### 配置映射关系
+
+所有配置，TOML配置键和环境变量有如下映射关系：
+
+- 所有环境变量以`AILINGBOT_`开头
+- 层级之间用两个下划线`__`隔开
+- 配置键内部的下划线在环境变量中保留
+- 不区分大小写
+
+例如：
+
+- `some_conf`的对应环境变量为`AILINGBOT_SOME_CONF`
+- `some_conf.conf_1`的对应环境变量为`AILINGBOT_SOME_CONF__CONF_1`
+- `some_conf.conf_1.subconf`的对应环境变量为`AILINGBOT_SOME_CONF__CONF_1__SUBCONF`
+
 ### 配置项
 
 #### 通用
 
-| 配置项       | 说明                                                                  | TOML                 | 环境变量                             |
-|-----------|---------------------------------------------------------------------|----------------------|----------------------------------|
-| 语言        | 语言码（参考：http://www.lingoes.net/en/translator/langcode.htm）           | lang                 | AILINGBOT__LANG                  |
-| 时区        | 时区码（参考：https://en.wikipedia.org/wiki/List_of_tz_database_time_zones | tz                   | AILINGBOT__TZ                    |
-| 会话策略名称    | 预置会话策略名称或完整会话策略class路径                                              | policy.name          | AILINGBOT__POLICY__NAME          |
-| Channel名称 | 预置Channel名称                                                         | channel.name         | AILINGBOT__CHANNEL__NAME         |
-| Webhook路径 | 非预置Channel webhook的完整class路径                                        | channel.webhook_name | AILINGBOT__CHANNEL__WEBHOOK_NAME |
-| Agent路径   | 非预置Channel agent的完整class路径                                          | channel.agent_name   | AILINGBOT__CHANNEL__AGENT_NAME   |
-| Uvicorn配置 | 所有uvicorn配置（参考：https://www.uvicorn.org/settings/)，这部分配置会透传给uvicorn  | uvicorn.*            | AILINGBOT__CHANNEL__UVICORN__*   |
+| 配置项       | 说明                                                                  | TOML                 | 环境变量                            |
+|-----------|---------------------------------------------------------------------|----------------------|---------------------------------|
+| 语言        | 语言码（参考：http://www.lingoes.net/en/translator/langcode.htm）           | lang                 | AILINGBOT_LANG                  |
+| 时区        | 时区码（参考：https://en.wikipedia.org/wiki/List_of_tz_database_time_zones | tz                   | AILINGBOT_TZ                    |
+| 会话策略名称    | 预置会话策略名称或完整会话策略class路径                                              | policy.name          | AILINGBOT_POLICY__NAME          |
+| Channel名称 | 预置Channel名称                                                         | channel.name         | AILINGBOT_CHANNEL__NAME         |
+| Webhook路径 | 非预置Channel webhook的完整class路径                                        | channel.webhook_name | AILINGBOT_CHANNEL__WEBHOOK_NAME |
+| Agent路径   | 非预置Channel agent的完整class路径                                          | channel.agent_name   | AILINGBOT_CHANNEL__AGENT_NAME   |
+| Uvicorn配置 | 所有uvicorn配置（参考：https://www.uvicorn.org/settings/)，这部分配置会透传给uvicorn  | uvicorn.*            | AILINGBOT_CHANNEL__UVICORN__*   |
+
+配置示例：
+
+```toml
+lang = "zh_CN"
+tz = "Asia/Shanghai"
+
+[policy]
+name = "lc_conversation"
+# 更多policy配置
+
+[policy.llm]
+# 模型配置
+
+[channel]
+name = "wechatwork"
+# 更多channel配置
+
+[uvicorn]
+host = "0.0.0.0"
+port = 8080
+```
 
 #### 内置会话策略配置
 
@@ -201,34 +238,208 @@ AilingBot的配置可以通过两种方式：
 
 lc_conversation使用LangChain的Conversation作为会话策略，其效果为直接和LLM对话，且带有对话历史上下文，因此可以进行多轮会话。
 
-| 配置项 | 说明 | TOML | 环境变量 |
-|-----|----|------|------|
+| 配置项    | 说明          | TOML                | 环境变量                           |
+|--------|-------------|---------------------|--------------------------------|
+| 会话历史长度 | 表示保留多少轮历史会话 | policy.history_size | AILINGBOT_POLICY__HISTORY_SIZE |
+
+配置示例：
+
+```toml
+# 使用lc_conversation策略，保留5轮历史会话
+[policy]
+name = "lc_conversation"
+history_size = 5
+```
 
 ##### lc_document_qa
 
 lc_document_qa使用LangChain的[Stuff](https://python.langchain.com/docs/modules/chains/document/stuff)作为对话策略。
 用户可上传一个文档，然后针对文档内容进行提问。
 
-| 配置项 | 说明 | TOML | 环境变量 |
-|-----|----|------|------|
+| 配置项     | 说明                                 | TOML                 | 环境变量                            |
+|---------|------------------------------------|----------------------|---------------------------------|
+| 文档切分块大小 | 对应LangChain Splitter的chunk_size    | policy.chunk_size    | AILINGBOT_POLICY__CHUNK_SIZE    |
+| 文档切重叠   | 对应LangChain Splitter的chunk_overlap | policy.chunk_overlap | AILINGBOT_POLICY__CHUNK_OVERLAP |
+
+配置示例：
+
+```toml
+# 使用lc_document_qa策略，chunk_size和chunk_overlap分别配置为1000和0
+[policy]
+name = "lc_conversation"
+chunk_size = 1000
+chunk_overlap = 0
+```
+
+#### 模型配置
+
+模型配置与LangChain保持一致，下面给出示例。
+
+##### OpenAI
+
+```toml
+[policy.llm]
+_type = "openai" # 对应环境变量AILINGBOT_POLICY__LLM___TYPE
+model_name = "gpt-3.5-turbo" # 对应环境变量AILINGBOT_POLICY__LLM__MODEL_NAME
+openai_api_key = "sk-pd8******************************HQQS241dNrHH1kv" # 对应环境变量AILINGBOT_POLICY__LLM__OPENAI_API_KEY
+temperature = 0 # 对应环境变量AILINGBOT_POLICY__LLM__TEMPERATURE
+```
 
 #### 内置Channel配置
 
 ##### 企业微信
 
-| 配置项 | 说明 | TOML | 环境变量 |
-|-----|----|------|------|
+| 配置项         | 说明                        | TOML               | 环境变量                          |
+|-------------|---------------------------|--------------------|-------------------------------|
+| Corp ID     | 企业微信自建app的corpid          | channel.corpid     | AILINGBOT_CHANNEL__CORPID     |
+| Corp Secret | 企业微信自建app的corpsecret      | channel.corpsecret | AILINGBOT_CHANNEL__CORPSECRET |
+| Agent ID    | 企业微信自建app的agentid         | channel.agentid    | AILINGBOT_CHANNEL__AGENTID    |
+| TOKEN       | 企业微信自建app的webhook token   | channel.token      | AILINGBOT_CHANNEL__TOKEN      |
+| AES KEY     | 企业微信自建app的webhook aes key | channel.aes_key    | AILINGBOT_CHANNEL__AES_KEY    |
+
+配置示例：
+
+```toml
+[channel]
+name = "wechatwork"
+corpid = "wwb**********ddb40"
+corpsecret = "TG3t******************************hZslJNe5Q"
+agentid = 1000001
+token = "j9SK**********zLeJdFSYh"
+aes_key = "7gCwzwH******************************p1p0O8"
+```
 
 ##### 飞书
 
-| 配置项 | 说明 | TOML | 环境变量 |
-|-----|----|------|------|
+| 配置项                | 说明                                | TOML                       | 环境变量                                  |
+|--------------------|-----------------------------------|----------------------------|---------------------------------------|
+| App ID             | 飞书自建应用的app id                     | channel.app_id             | AILINGBOT_CHANNEL__APP_ID             |
+| App Secret         | 飞书自建应用的app secret                 | channel.app_secret         | AILINGBOT_CHANNEL__APP_SECRET         |
+| Verification Token | 飞书自建应用的webhook verification token | channel.verification_token | AILINGBOT_CHANNEL__VERIFICATION_TOKEN |
+
+配置示例：
+
+```toml
+[channel]
+name = "feishu"
+app_id = "cli_a**********9d00e"
+app_secret = "y********************cyk8AxmYVDD"
+verification_token = "yIJ********************7bfNHUcYH"
+```
 
 ## 命令行工具
 
-TBD
+### 初始化配置文件（init）
+
+#### 使用方法
+
+`init`命令将在当前目录生成配置文件settings.toml。默认情况下，将以交互方式询问用户，
+可以使用`--silence`让生成过程不询问用户，直接使用默认配置。
+
+```text
+Usage: ailingbot init [OPTIONS]
+
+  Initialize the AilingBot environment.
+
+Options:
+  --silence    Without asking the user.
+  --overwrite  Overwrite existing file if a file with the same name already
+               exists.
+  --help       Show this message and exit.
+```
+
+#### Options
+
+| Option      | 说明                     | 类型   | 备注 |
+|-------------|------------------------|------|----|
+| --silence   | 不询问用户，直接生成默认配置         | Flag |    |
+| --overwrite | 允许覆盖当前目录的settings.toml | Flag |    |
+
+### 查看当前配置（config）
+
+`config`命令将读取当前环境的配置（包括配置文件及环境变量配置，并进行合并）。
+
+#### 使用方法
+
+```text
+Usage: ailingbot config [OPTIONS]
+
+  Show current configuration information.
+
+Options:
+  -k, --config-key TEXT  Configuration key.
+  --help                 Show this message and exit.
+```
+
+#### Options
+
+| Option           | 说明  | 类型     | 备注             |
+|------------------|-----|--------|----------------|
+| -k, --config-key | 配置键 | String | 不传入的话，显示完整配置信息 |
+
+### 启动命令行机器人（chat）
+
+`chat`命令启动一个交互式命令行机器人，用于测试当前chat policy。
+
+#### 使用方法
+
+```text
+Usage: ailingbot chat [OPTIONS]
+
+  Start an interactive bot conversation environment.
+
+Options:
+  --debug  Enable debug mode.
+  --help   Show this message and exit.
+```
+
+#### Options
+
+| Option  | 说明        | 类型   | 备注                     |
+|---------|-----------|------|------------------------|
+| --debug | 开启debug模式 | Flag | Debug模式将输出更多内容，如prompt |
+
+### 启动Webhook服务（serve）
+
+`serve`命令启动Webhook HTTP server，用于真正实现和具体IM进行交互。
+
+#### 使用方法
+
+```text
+Usage: ailingbot serve [OPTIONS]
+
+  Run webhook server to receive events.
+
+Options:
+  --log-level [TRACE|DEBUG|INFO|SUCCESS|WARNING|ERROR|CRITICAL]
+                                  The minimum severity level from which logged
+                                  messages should be sent to(read from
+                                  environment variable AILINGBOT_LOG_LEVEL if
+                                  is not passed into).  [default: TRACE]
+  --log-file TEXT                 STDOUT, STDERR, or file path(read from
+                                  environment variable AILINGBOT_LOG_FILE if
+                                  is not passed into).  [default: STDERR]
+  --help                          Show this message and exit.
+```
+
+#### Options
+
+| Option      | 说明                  | 类型     | 备注                    |
+|-------------|---------------------|--------|-----------------------|
+| --log-level | 显示日志级别，将显示此级别及以上的日志 | String | 默认显示所有级别（TRACE）       |
+| --log-file  | 日志输出位置              | String | 默认情况日志打印到标准错误（STDERR） |
 
 # 💻开发指南
+
+## 开发总则
+
+TBD
+
+## 开发对话策略
+
+TBD
+
+## 开发Channel
 
 TBD
 
