@@ -4,7 +4,7 @@ import json
 import typing
 
 from asgiref.typing import ASGIApplication
-from cachetools import TTLCache
+from cachetools import LRUCache
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
 from starlette.background import BackgroundTasks
@@ -64,21 +64,21 @@ class FeishuEventBody(BaseModel):
 class FeishuWebhookFactory(ChannelWebhookFactory):
     """Factory that creates Feishu webhook ASGI application."""
 
-    def __init__(self):
-        super(FeishuWebhookFactory, self).__init__()
+    def __init__(self, *, debug: bool = False):
+        super(FeishuWebhookFactory, self).__init__(debug=debug)
 
         self.verification_token = settings.channel.verification_token
 
         self.app: typing.Optional[ASGIApplication | typing.Callable] = None
         self.agent: typing.Optional[FeishuAgent] = None
         self.bot: typing.Optional[ChatBot] = None
-        self.event_id_cache: typing.Optional[TTLCache] = None
+        self.event_id_cache: typing.Optional[LRUCache] = None
 
     async def create_webhook_app(self) -> ASGIApplication | typing.Callable:
         self.app = FastAPI()
         self.agent = FeishuAgent()
         self.bot = ChatBot(debug=self.debug)
-        self.event_id_cache = TTLCache(maxsize=1024, ttl=120)
+        self.event_id_cache = LRUCache(maxsize=1024)
 
         async def _chat_task(
             conversation_id: str, event: FeishuEventBody

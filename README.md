@@ -447,8 +447,8 @@ TBD
 
 - [ ] 提供完善的使用文档和开发者文档
 - [ ] 支持更多的IM端，如钉钉、Slack等
-- [ ] 支持更多常用LLM prompting范式和开箱即用的对话策略
-- [ ] 对LLM Chain中的常用能力，如对Vector Embedding&Query和Grounding提供支持
-- [ ] 提供WebUI
+- [ ] 开发更多的开箱即用的对话策略
+- [ ] 对向量数据库等基础组件做更完善的自持，并自持Grounding能力
+- [ ] 提供API及WebUI
 - [ ] 提供基于Docker容器的一键部署能力
 - [ ] 增强系统的可观测性和可治理性

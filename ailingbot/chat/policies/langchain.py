@@ -148,6 +148,7 @@ class LCDocumentQAPolicy(ChatPolicy):
                     content=message.content, file_type=message.file_type
                 ),
                 return_source_documents=False,
+                verbose=self.debug,
             )
             response = TextResponseMessage()
             response.text = f'我已完成学习，现在可以针对 {message.file_name} 进行提问了'

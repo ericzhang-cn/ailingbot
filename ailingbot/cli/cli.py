@@ -166,14 +166,18 @@ async def chat(
 )
 @options.log_level_option
 @options.log_file_option
+@click.option('--debug', is_flag=True, help='Enable debug mode.')
 @_coro_cmd
 async def serve(
     log_level: str,
     log_file: str,
+    debug: bool,
 ):
     _set_logger(sink=log_file, level=log_level)
 
-    webhook = await ChannelWebhookFactory.get_webhook(settings.channel.name)
+    webhook = await ChannelWebhookFactory.get_webhook(
+        settings.channel.name, debug=debug
+    )
 
     config = uvicorn.Config(app=webhook, **settings.uvicorn)
     server = uvicorn.Server(config)

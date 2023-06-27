@@ -53,7 +53,9 @@ class ChannelWebhookFactory(abc.ABC):
         raise NotImplementedError
 
     @staticmethod
-    async def get_webhook(name: str) -> ASGIApplication | typing.Callable:
+    async def get_webhook(
+        name: str, debug: bool = False
+    ) -> ASGIApplication | typing.Callable:
         """Gets channel webhook ASGI application instance.
 
         :param name: Built-in channel name or full path of webhook factory class.
@@ -66,13 +68,13 @@ class ChannelWebhookFactory(abc.ABC):
                 WechatworkWebhookFactory,
             )
 
-            factory = WechatworkWebhookFactory()
+            factory = WechatworkWebhookFactory(debug=debug)
         elif name.lower() == 'feishu':
             from ailingbot.channels.feishu.webhook import (
                 FeishuWebhookFactory,
             )
 
-            factory = FeishuWebhookFactory()
+            factory = FeishuWebhookFactory(debug=debug)
         else:
             factory = get_class_dynamically(name)()
 
