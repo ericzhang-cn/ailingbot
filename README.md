@@ -315,7 +315,7 @@ AilingBot的配置可以通过两种方式：
 | Channel名称 | 预置Channel名称                                                         | channel.name         | AILINGBOT_CHANNEL__NAME         |
 | Webhook路径 | 非预置Channel webhook的完整class路径                                        | channel.webhook_name | AILINGBOT_CHANNEL__WEBHOOK_NAME |
 | Agent路径   | 非预置Channel agent的完整class路径                                          | channel.agent_name   | AILINGBOT_CHANNEL__AGENT_NAME   |
-| Uvicorn配置 | 所有uvicorn配置（参考：(uvicorn settings)[https://www.uvicorn.org/settings/])，这部分配置会透传给uvicorn  | uvicorn.*            | AILINGBOT_CHANNEL__UVICORN__*   |
+| Uvicorn配置 | 所有uvicorn配置（参考：[uvicorn settings](https://www.uvicorn.org/settings/)），这部分配置会透传给uvicorn  | uvicorn.*            | AILINGBOT_CHANNEL__UVICORN__*   |
 
 配置示例：
 
