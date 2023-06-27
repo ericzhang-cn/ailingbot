@@ -107,6 +107,7 @@ class LCDocumentQAPolicy(ChatPolicy):
         if file_type.lower() != 'pdf':
             raise ailingbot.shared.errors.ChatPolicyError(
                 reason='目前只支持PDF文档',
+                suggestion='请上传PDF文档',
             )
 
         with tempfile.NamedTemporaryFile(delete=True) as tf:
@@ -132,7 +133,8 @@ class LCDocumentQAPolicy(ChatPolicy):
         if isinstance(message, TextRequestMessage):
             if conversation_id not in self.chains:
                 response = FallbackResponseMessage()
-                response.reason = '请先上传文档'
+                response.reason = '还没有上传文档'
+                response.suggestion = '请先上传文档'
             else:
                 response = TextResponseMessage()
                 response.text = await self.chains[conversation_id].arun(

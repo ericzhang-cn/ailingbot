@@ -1,6 +1,10 @@
 import functools
 
-from ailingbot.chat.messages import ResponseMessage, TextResponseMessage
+from ailingbot.chat.messages import (
+    ResponseMessage,
+    TextResponseMessage,
+    FallbackResponseMessage,
+)
 
 
 @functools.singledispatch
@@ -24,4 +28,27 @@ async def _render(response: TextResponseMessage) -> tuple[dict, str]:
         'text': response.text,
     }
     message_type = 'text'
+    return content, message_type
+
+
+@render.register
+async def _render(response: FallbackResponseMessage) -> tuple[dict, str]:
+    """Renders text response message."""
+    card = {
+        'config': {'wide_screen_mode': True},
+        'elements': [
+            {
+                'tag': 'markdown',
+                'content': f'**原因**：{response.reason}\n**建议**：{response.suggestion}',
+            }
+        ],
+        'header': {
+            'template': 'orange',
+            'title': {'content': '🤔出了一些问题', 'tag': 'plain_text'},
+        },
+    }
+    content = {
+        'text': response.text,
+    }
+    message_type = 'interactive'
     return content, message_type
