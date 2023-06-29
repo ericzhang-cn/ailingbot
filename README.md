@@ -495,6 +495,24 @@ app_secret = "y********************cyk8AxmYVDD"
 verification_token = "yIJ********************7bfNHUcYH"
 ```
 
+##### 钉钉
+
+| 配置项        | 说明                | TOML               | 环境变量                          |
+|------------|-------------------|--------------------|-------------------------------|
+| App Key    | 钉钉自建应用的app key    | channel.app_key    | AILINGBOT_CHANNEL__APP_KEY    |
+| App Secret | 钉钉自建应用的app secret | channel.app_secret | AILINGBOT_CHANNEL__APP_SECRET |
+| Robot Code | 钉钉自建应用的robot code | channel.robot_code | AILINGBOT_CHANNEL__ROBOT_CODE |
+
+配置示例：
+
+```toml
+[channel]
+name = "dingtalk"
+app_key = "dingi**********wymdr"
+app_secret = "ombrcUp****************************************GL2AwObLjILUY1MzD"
+robot_code = "ding**********owymdr"
+```
+
 ## 命令行工具
 
 ### 初始化配置文件（init）
@@ -628,7 +646,7 @@ TBD
     - [ ] 大语言模型
     - [ ] 知识库
 - [ ] 支持本地模型部署
-  - [ ] ChatGLM-6B
+    - [ ] ChatGLM-6B
 - [ ] 支持通过API调用
 - [ ] Web管理后台及可视化配置管理
 - [x] 提供基于Docker容器的部署能力
