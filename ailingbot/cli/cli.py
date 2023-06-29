@@ -176,7 +176,9 @@ async def serve(
     _set_logger(sink=log_file, level=log_level)
 
     webhook = await ChannelWebhookFactory.get_webhook(
-        settings.channel.name, debug=debug
+        settings.channel.name,
+        settings.channel.get('webhook_name', None),
+        debug=debug,
     )
 
     config = uvicorn.Config(app=webhook, **settings.uvicorn)

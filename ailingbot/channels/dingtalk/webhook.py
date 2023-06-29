@@ -10,7 +10,11 @@ from starlette.background import BackgroundTasks
 from ailingbot.channels.channel import ChannelWebhookFactory
 from ailingbot.channels.dingtalk.agent import DingtalkAgent
 from ailingbot.chat.chatbot import ChatBot
-from ailingbot.chat.messages import TextRequestMessage, MessageScope
+from ailingbot.chat.messages import (
+    TextRequestMessage,
+    MessageScope,
+    FileRequestMessage,
+)
 
 
 class DingtalkMessage(BaseModel):
@@ -40,6 +44,9 @@ class DingtalkWebhookFactory(ChannelWebhookFactory):
         self.agent = DingtalkAgent()
         self.bot = ChatBot(debug=self.debug)
 
+        async def _download_file() -> bytes:
+            return b''
+
         async def _chat_task(
             conversation_id: str, dingtalk_message: DingtalkMessage
         ) -> None:
@@ -48,6 +55,23 @@ class DingtalkWebhookFactory(ChannelWebhookFactory):
             if dingtalk_message.msgtype == 'text':
                 req_msg = TextRequestMessage(
                     text=dingtalk_message.text.get('content', ''),
+                )
+            elif dingtalk_message.msgtype == 'file':
+                dingtalk = DingtalkAgent()
+                file_name = dingtalk_message.content.get('fileName', '')
+                if len(file_name.split('.')) >= 2:
+                    file_type = file_name.split('.')[-1].strip().lower()
+                else:
+                    file_type = ''
+                file_content = await dingtalk.download_file(
+                    download_code=dingtalk_message.content.get(
+                        'downloadCode', ''
+                    )
+                )
+                req_msg = FileRequestMessage(
+                    file_name=file_name,
+                    file_type=file_type,
+                    content=file_content,
                 )
             else:
                 return

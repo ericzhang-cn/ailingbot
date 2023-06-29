@@ -16,11 +16,15 @@ class ChannelAgent(AbstractAsyncComponent, abc.ABC):
         super(ChannelAgent, self).__init__()
 
     @staticmethod
-    def get_agent(name: str) -> ChannelAgent:
+    def get_agent(
+        name: str, full_class_path: typing.Optional[str] = None
+    ) -> ChannelAgent:
         """Gets channel agent instance.
 
         :param name: Built-in channel name or full path of agent class.
         :type name: str
+        :param full_class_path:
+        :type full_class_path:
         :return: Agent instance.
         :rtype: ChannelAgent
         """
@@ -37,7 +41,7 @@ class ChannelAgent(AbstractAsyncComponent, abc.ABC):
 
             instance = DingtalkAgent()
         else:
-            instance = get_class_dynamically(name)()
+            instance = get_class_dynamically(full_class_path)()
 
         return instance
 
@@ -58,12 +62,16 @@ class ChannelWebhookFactory(abc.ABC):
 
     @staticmethod
     async def get_webhook(
-        name: str, debug: bool = False
+        name: str,
+        full_class_path: typing.Optional[str] = None,
+        debug: bool = False,
     ) -> ASGIApplication | typing.Callable:
         """Gets channel webhook ASGI application instance.
 
         :param name: Built-in channel name or full path of webhook factory class.
         :type name: str
+        :param full_class_path:
+        :type full_class_path:
         :param debug:
         :type debug:
         :return: Webhook ASGI application.
@@ -89,6 +97,6 @@ class ChannelWebhookFactory(abc.ABC):
 
             factory = DingtalkWebhookFactory(debug=debug)
         else:
-            factory = get_class_dynamically(name)()
+            factory = get_class_dynamically(full_class_path)()
 
         return await factory.create_webhook_app()

@@ -42,7 +42,7 @@ class LCConversationChatPolicy(ChatPolicy):
         llm_config = copy.deepcopy(settings.policy.llm)
         llm = load_llm_from_config(llm_config)
         self.chain = ConversationChain(llm=llm, verbose=debug)
-        self.history_size = settings.policy.history_size or 5
+        self.history_size = settings.policy.get('history_size', 5)
         self.memories: dict[str, BaseChatMemory] = {}
 
     async def _load_memory(self, *, conversation_id: str) -> BaseChatMemory:
@@ -91,8 +91,8 @@ class LCDocumentQAPolicy(ChatPolicy):
         llm_config = copy.deepcopy(settings.policy.llm)
         self.llm = load_llm_from_config(llm_config)
         self.chains: dict[str, Chain] = {}
-        self.chunk_size = settings.policy.chunk_size or 1000
-        self.chunk_overlap = settings.policy.chunk_overlap or 0
+        self.chunk_size = settings.policy.get('chunk_size', 1000)
+        self.chunk_overlap = settings.policy.get('chunk_overlap', 0)
 
     def _build_documents_index(
         self, *, content: bytes, file_type: str

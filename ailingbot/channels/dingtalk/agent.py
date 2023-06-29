@@ -136,3 +136,32 @@ class DingtalkAgent(ChannelAgent):
                 open_conversation_id=message.echo.get('conversation_id', ''),
                 body=body,
             )
+
+    async def download_file(self, *, download_code: str) -> bytes:
+        """Download file."""
+        access_token = await self._get_access_token()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                'https://api.dingtalk.com/v1.0/robot/messageFiles/download',
+                json={
+                    'downloadCode': download_code,
+                    'robotCode': self.robot_code,
+                },
+                headers={
+                    'x-acs-dingtalk-access-token': access_token,
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+            ) as response:
+                if not response.ok:
+                    response.raise_for_status()
+                body = await response.json()
+        if body.get('downloadUrl', None) is None:
+            raise ExternalHTTPAPIError(body.get('message', ''))
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                body.get('downloadUrl', ''),
+            ) as response:
+                if not response.ok:
+                    response.raise_for_status()
+                return await response.content.read()
