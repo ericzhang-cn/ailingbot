@@ -1,6 +1,5 @@
 import copy
 import tempfile
-import uuid
 
 from langchain import ConversationChain
 from langchain.chains import RetrievalQA
@@ -73,11 +72,6 @@ class LCConversationChatPolicy(ChatPolicy):
                 )
             response = TextResponseMessage()
             response.text = await self.chain.arun(message.text)
-        response.uuid = str(uuid.uuid4())
-        response.ack_uuid = message.uuid
-        response.receiver_id = message.sender_id
-        response.scope = message.scope
-        response.echo = message.echo
 
         return response
 
@@ -155,11 +149,5 @@ class LCDocumentQAPolicy(ChatPolicy):
         else:
             response = FallbackResponseMessage()
             response.reason = '不支持的消息类型'
-
-        response.uuid = str(uuid.uuid4())
-        response.ack_uuid = message.uuid
-        response.receiver_id = message.sender_id
-        response.scope = message.scope
-        response.echo = message.echo
 
         return response

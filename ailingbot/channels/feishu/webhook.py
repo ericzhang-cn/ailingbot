@@ -101,7 +101,6 @@ class FeishuWebhookFactory(ChannelWebhookFactory):
                 req_msg.scope = MessageScope.USER
             elif event.event.message.chat_type == 'group':
                 req_msg.scope = MessageScope.GROUP
-                req_msg.meta['chat_id'] = event.event.message.chat_id
 
             response = await self.bot.chat(
                 conversation_id=conversation_id, message=req_msg

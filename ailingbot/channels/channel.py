@@ -60,6 +60,8 @@ class ChannelWebhookFactory(abc.ABC):
 
         :param name: Built-in channel name or full path of webhook factory class.
         :type name: str
+        :param debug:
+        :type debug:
         :return: Webhook ASGI application.
         :rtype: typing.Union[ASGIApplication, typing.Callable]
         """
@@ -75,6 +77,13 @@ class ChannelWebhookFactory(abc.ABC):
             )
 
             factory = FeishuWebhookFactory(debug=debug)
+
+        elif name.lower() == 'dingtalk':
+            from ailingbot.channels.dingtalk.webhook import (
+                DingtalkWebhookFactory,
+            )
+
+            factory = DingtalkWebhookFactory(debug=debug)
         else:
             factory = get_class_dynamically(name)()
 

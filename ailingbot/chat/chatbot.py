@@ -47,19 +47,21 @@ class ChatBot(AbstractAsyncComponent):
 
         async with lock:
             try:
-                return await self.policy.respond(
+                r = await self.policy.respond(
                     conversation_id=conversation_id, message=message
                 )
             except Exception as e:
                 logger.error(e)
-                return FallbackResponseMessage(
-                    uuid=str(uuid.uuid4()),
-                    ack_uuid=message.uuid,
-                    receiver_id=message.sender_id,
-                    scope=message.scope,
-                    echo=message.echo,
+                r = FallbackResponseMessage(
                     reason=str(e),
                 )
+            r.uuid = str(uuid.uuid4())
+            r.ack_uuid = message.uuid
+            r.receiver_id = message.sender_id
+            r.scope = message.scope
+            r.echo = r.echo
+
+            return r
 
     async def _initialize(self) -> None:
         self.policy = ChatPolicy.get_policy(
