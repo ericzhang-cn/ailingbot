@@ -322,6 +322,13 @@ async def init(silence: bool, overwrite: bool):
                 'app_secret': '',
                 'verification_token': 0,
             }
+        elif channel == 'dingtalk':
+            config['channel'] = {
+                'name': 'dingtalk',
+                'app_key': '',
+                'app_secret': '',
+                'robot_code': '',
+            }
 
     with open(file_path, 'w') as f:
         f.write(tomlkit.dumps(config))

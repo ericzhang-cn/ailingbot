@@ -245,6 +245,69 @@ ailingbot serve
     <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/feishu-screenshot.png" alt="企业微信机器人" width="1000"/>
 </p>
 
+## 接入钉钉
+
+下面演示如何快速将上面的机器人接入钉钉。
+
+### 通过Docker
+
+```shell
+git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
+cd ailingbot
+docker build -t ailingbot .
+docker run -d \
+  -e AILINGBOT_POLICY__NAME=lc_conversation \
+  -e AILINGBOT_POLICY__HISTORY_SIZE=5 \
+  -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
+  -e AILINGBOT_CHANNEL__NAME=dingtalk \
+  -e AILINGBOT_CHANNEL__APP_KEY={你的钉钉机器人app key} \
+  -e AILINGBOT_CHANNEL__APP_SECRET={你的钉钉机器人app secret} \
+  -e AILINGBOT_CHANNEL__ROBOT_CODE={你的钉钉机器人robot code} \
+  -p 8080:8080
+  ailingbot poetry run ailingbot serve
+```
+
+### 通过PIP
+
+#### 安装
+
+```shell
+pip install ailingbot
+```
+
+#### 生成配置文件
+
+```shell
+ailingbot init --silence --overwrite
+```
+
+#### 修改配置文件
+
+打开`settings.toml`，将其中的channel部分改为如下，并填入你的飞书真实信息：
+
+```toml
+[channel]
+name = "dingtalk"
+app_key = "" # 填写真实信息
+app_secret = "" # 填写真实信息
+robot_code = "" # 填写真实信息
+```
+
+#### 启动服务
+
+```shell
+ailingbot serve
+```
+
+最后我们需要去钉钉的管理后台，将webhook地址配置好。
+钉钉Webhook的URL为：`http(s)://你的公网IP:8080/webhook/dingtalk/event/`
+
+完成以上配置后，就可以在钉钉中找到机器人，进行对话了：
+
+<p align="center">
+    <img src="./img/dingtalk-screenshot.png" alt="企业微信机器人" />
+</p>
+
 # 📖使用指南
 
 ## 主要流程
@@ -305,15 +368,15 @@ AilingBot的配置可以通过两种方式：
 
 #### 通用
 
-| 配置项       | 说明                                                                  | TOML                 | 环境变量                            |
-|-----------|---------------------------------------------------------------------|----------------------|---------------------------------|
-| 语言        | 语言码（参考：http://www.lingoes.net/en/translator/langcode.htm）           | lang                 | AILINGBOT_LANG                  |
-| 时区        | 时区码（参考：https://en.wikipedia.org/wiki/List_of_tz_database_time_zones | tz                   | AILINGBOT_TZ                    |
-| 会话策略名称    | 预置会话策略名称或完整会话策略class路径                                              | policy.name          | AILINGBOT_POLICY__NAME          |
-| Channel名称 | 预置Channel名称                                                         | channel.name         | AILINGBOT_CHANNEL__NAME         |
-| Webhook路径 | 非预置Channel webhook的完整class路径                                        | channel.webhook_name | AILINGBOT_CHANNEL__WEBHOOK_NAME |
-| Agent路径   | 非预置Channel agent的完整class路径                                          | channel.agent_name   | AILINGBOT_CHANNEL__AGENT_NAME   |
-| Uvicorn配置 | 所有uvicorn配置（参考：[uvicorn settings](https://www.uvicorn.org/settings/)），这部分配置会透传给uvicorn  | uvicorn.*            | AILINGBOT_CHANNEL__UVICORN__*   |
+| 配置项       | 说明                                                                                     | TOML                 | 环境变量                            |
+|-----------|----------------------------------------------------------------------------------------|----------------------|---------------------------------|
+| 语言        | 语言码（参考：http://www.lingoes.net/en/translator/langcode.htm）                              | lang                 | AILINGBOT_LANG                  |
+| 时区        | 时区码（参考：https://en.wikipedia.org/wiki/List_of_tz_database_time_zones                    | tz                   | AILINGBOT_TZ                    |
+| 会话策略名称    | 预置会话策略名称或完整会话策略class路径                                                                 | policy.name          | AILINGBOT_POLICY__NAME          |
+| Channel名称 | 预置Channel名称                                                                            | channel.name         | AILINGBOT_CHANNEL__NAME         |
+| Webhook路径 | 非预置Channel webhook的完整class路径                                                           | channel.webhook_name | AILINGBOT_CHANNEL__WEBHOOK_NAME |
+| Agent路径   | 非预置Channel agent的完整class路径                                                             | channel.agent_name   | AILINGBOT_CHANNEL__AGENT_NAME   |
+| Uvicorn配置 | 所有uvicorn配置（参考：[uvicorn settings](https://www.uvicorn.org/settings/)），这部分配置会透传给uvicorn | uvicorn.*            | AILINGBOT_CHANNEL__UVICORN__*   |
 
 配置示例：
 
@@ -554,16 +617,18 @@ TBD
 - [ ] 支持更多的Channel
     - [x] 企业微信
     - [x] 飞书
-    - [ ] 钉钉
+    - [x] 钉钉
     - [ ] Slack
 - [ ] 开发更多的开箱即用的对话策略
     - [x] 多轮会话策略
     - [ ] 文档问答策略
-    - [ ] 数据问答策略
+    - [ ] 数据库问答策略
+    - [ ] 在线搜索问答策略
 - [ ] 基础组件抽象
-    - [ ] LLM
-    - [ ] 向量数据库
-    - [ ] Tools
+    - [ ] 大语言模型
+    - [ ] 知识库
+- [ ] 支持本地模型不是
+  - [ ] ChatGLM-6B
 - [ ] 支持通过API调用
 - [ ] Web管理后台及可视化配置管理
 - [x] 提供基于Docker容器的部署能力
