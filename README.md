@@ -305,7 +305,7 @@ ailingbot serve
 完成以上配置后，就可以在钉钉中找到机器人，进行对话了：
 
 <p align="center">
-    <img src="./img/dingtalk-screenshot.png" alt="企业微信机器人" />
+    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/dingtalk-screenshot.png" alt="企业微信机器人" />
 </p>
 
 # 📖使用指南
