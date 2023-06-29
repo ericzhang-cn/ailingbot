@@ -20,7 +20,7 @@ class DingtalkMessage(BaseModel):
     senderId: typing.Optional[str]
     senderStaffId: typing.Optional[str]
     senderNick: typing.Optional[str]
-    msgType: typing.Optional[str]
+    msgtype: typing.Optional[str]
     text: typing.Optional[dict]
     content: typing.Optional[dict]
 
@@ -45,7 +45,7 @@ class DingtalkWebhookFactory(ChannelWebhookFactory):
         ) -> None:
             """Send a request message to the bot, receive a response message, and send it back to the user."""
 
-            if dingtalk_message.msgType == 'text':
+            if dingtalk_message.msgtype == 'text':
                 req_msg = TextRequestMessage(
                     text=dingtalk_message.text.get('content', ''),
                 )
@@ -56,12 +56,12 @@ class DingtalkWebhookFactory(ChannelWebhookFactory):
             req_msg.sender_id = dingtalk_message.senderId
             if dingtalk_message.conversationType == '1':
                 req_msg.scope = MessageScope.USER
-                req_msg.echo['stuff_ids'] = [dingtalk_message.senderStaffId]
+                req_msg.echo['staff_ids'] = [dingtalk_message.senderStaffId]
             elif dingtalk_message.conversationType == '2':
                 req_msg.scope = MessageScope.GROUP
-                req_msg.echo['conversation_id'] = [
-                    dingtalk_message.conversationId
-                ]
+                req_msg.echo[
+                    'conversation_id'
+                ] = dingtalk_message.conversationId
 
             response = await self.bot.chat(
                 conversation_id=conversation_id, message=req_msg

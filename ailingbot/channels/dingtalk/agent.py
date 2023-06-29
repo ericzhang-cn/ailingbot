@@ -7,7 +7,7 @@ import aiohttp
 import arrow
 
 from ailingbot.channels.channel import ChannelAgent
-from ailingbot.channels.feishu.render import render
+from ailingbot.channels.dingtalk.render import render
 from ailingbot.chat.messages import ResponseMessage, MessageScope
 from ailingbot.config import settings
 from ailingbot.shared.errors import ExternalHTTPAPIError

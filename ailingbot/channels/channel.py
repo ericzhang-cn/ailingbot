@@ -32,6 +32,10 @@ class ChannelAgent(AbstractAsyncComponent, abc.ABC):
             from ailingbot.channels.feishu.agent import FeishuAgent
 
             instance = FeishuAgent()
+        elif name.lower() == 'dingtalk':
+            from ailingbot.channels.dingtalk.agent import DingtalkAgent
+
+            instance = DingtalkAgent()
         else:
             instance = get_class_dynamically(name)()
 

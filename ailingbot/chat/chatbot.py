@@ -59,7 +59,7 @@ class ChatBot(AbstractAsyncComponent):
             r.ack_uuid = message.uuid
             r.receiver_id = message.sender_id
             r.scope = message.scope
-            r.echo = r.echo
+            r.echo = message.echo
 
             return r
 
