@@ -434,7 +434,7 @@ lc_document_qa使用LangChain的[Stuff](https://python.langchain.com/docs/module
 ```toml
 # 使用lc_document_qa策略，chunk_size和chunk_overlap分别配置为1000和0
 [policy]
-name = "lc_conversation"
+name = "lc_document_qa"
 chunk_size = 1000
 chunk_overlap = 0
 ```
