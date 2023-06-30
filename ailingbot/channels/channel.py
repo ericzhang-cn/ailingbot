@@ -96,7 +96,13 @@ class ChannelWebhookFactory(abc.ABC):
             )
 
             factory = DingtalkWebhookFactory(debug=debug)
+        elif name.lower() == 'slack':
+            from ailingbot.channels.slack.webhook import (
+                SlackWebhookFactory,
+            )
+
+            factory = SlackWebhookFactory(debug=debug)
         else:
-            factory = get_class_dynamically(full_class_path)()
+            factory = get_class_dynamically(full_class_path)(debug=debug)
 
         return await factory.create_webhook_app()
