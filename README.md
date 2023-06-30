@@ -242,7 +242,7 @@ ailingbot serve
 完成以上配置后，就可以在飞书中找到机器人，进行对话了：
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/feishu-screenshot.png" alt="企业微信机器人" width="1000"/>
+    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/feishu-screenshot.png" alt="飞书机器人" width="1000"/>
 </p>
 
 ## 接入钉钉
@@ -305,7 +305,89 @@ ailingbot serve
 完成以上配置后，就可以在钉钉中找到机器人，进行对话了：
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/dingtalk-screenshot.png" alt="企业微信机器人" />
+    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/dingtalk-screenshot.png" alt="钉钉机器人" />
+</p>
+
+## 接入Slack
+
+下面演示如何快速将上面的机器人接入Slack，并启用文档知识问答策略。
+
+### 通过Docker
+
+```shell
+git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
+cd ailingbot
+docker build -t ailingbot .
+docker run -d \
+  -e AILINGBOT_POLICY__NAME=lc_document_qa \
+  -e AILINGBOT_POLICY__CHUNK_SIZE=1000 \
+  -e AILINGBOT_POLICY__CHUNK_OVERLAP=0 \
+  -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
+  -e AILINGBOT_POLICY__LLM__MODEL_NAME=gpt-3.5-turbo-16k \
+  -e AILINGBOT_CHANNEL__NAME=slack \
+  -e AILINGBOT_CHANNEL__VERIFICATION_TOKEN={你的Slack App webhook verification token} \
+  -e AILINGBOT_CHANNEL__OAUTH_TOKEN={你的Slack App oauth token} \
+  -p 8080:8080
+  ailingbot poetry run ailingbot serve
+```
+
+### 通过PIP
+
+#### 安装
+
+```shell
+pip install ailingbot
+```
+
+#### 生成配置文件
+
+```shell
+ailingbot init --silence --overwrite
+```
+
+#### 修改配置文件
+
+打开`settings.toml`，将其中的channel部分改为如下，并填入你的飞书真实信息：
+
+```toml
+[channel]
+name = "slack"
+verification_token = "" # 填写真实信息
+oauth_token = "" # 填写真实信息
+```
+
+将policy部分替换为文档问答策略：
+
+```toml
+[policy]
+name = "lc_document_qa"
+chunk_size = 1000
+chunk_overlap = 5
+```
+
+最后建议在使用文档问答策略时，使用16k模型，因此将`policy.llm.model_name`修改为如下配置：
+
+```toml
+[policy.llm]
+_type = "openai"
+model_name = "gpt-3.5-turbo-16k" # 这里改为gpt-3.5-turbo-16k
+openai_api_key = "" # 填写真实信息
+temperature = 0
+```
+
+#### 启动服务
+
+```shell
+ailingbot serve
+```
+
+最后我们需要去Slack的管理后台，将webhook地址配置好。
+飞书Webhook的URL为：`http(s)://你的公网IP:8080/webhook/slack/event/`
+
+完成以上配置后，就可以在飞书中找到机器人，进行对话了：
+
+<p align="center">
+    <img src="./img/slack-screenshot.png" alt="Slack机器人" width="1000"/>
 </p>
 
 # 📖使用指南
