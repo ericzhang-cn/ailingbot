@@ -37,6 +37,9 @@ class SlackWebhookFactory(ChannelWebhookFactory):
 
         async def _chat_task(conversation_id: str, event: dict) -> None:
             """Send a request message to the bot, receive a response message, and send it back to the user."""
+            if 'bot_id' in event:
+                return
+
             if 'files' in event:
                 file_name = event['files'][0]['name']
                 file_type = event['files'][0]['filetype'].lower()
@@ -80,8 +83,8 @@ class SlackWebhookFactory(ChannelWebhookFactory):
 
         @self.app.post('/webhook/slack/event/', status_code=status.HTTP_200_OK)
         async def handle_event(
-            request: Request,
-            background_tasks: BackgroundTasks,
+                request: Request,
+                background_tasks: BackgroundTasks,
         ) -> dict | Response:
             """Handle the event request from Slack.
 
