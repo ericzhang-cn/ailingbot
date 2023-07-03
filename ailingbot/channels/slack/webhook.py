@@ -83,8 +83,8 @@ class SlackWebhookFactory(ChannelWebhookFactory):
 
         @self.app.post('/webhook/slack/event/', status_code=status.HTTP_200_OK)
         async def handle_event(
-                request: Request,
-                background_tasks: BackgroundTasks,
+            request: Request,
+            background_tasks: BackgroundTasks,
         ) -> dict | Response:
             """Handle the event request from Slack.
 

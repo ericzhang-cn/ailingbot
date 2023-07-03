@@ -10,16 +10,12 @@ from prompt_toolkit.key_binding import KeyBindings, merge_key_bindings
 from prompt_toolkit.key_binding.defaults import load_key_bindings
 from prompt_toolkit.layout import Layout, HSplit
 from prompt_toolkit.widgets import RadioList, Label, TextArea
-from tabulate import tabulate
 
 from ailingbot.chat.messages import (
     ResponseMessage,
     TextResponseMessage,
     FallbackResponseMessage,
-    TabularResponseMessage,
-    OptionsResponseMessage,
     SilenceResponseMessage,
-    InputResponseMessage,
 )
 
 
@@ -137,43 +133,3 @@ async def _render(response: FallbackResponseMessage) -> None:
     click.secho('----------', fg='red')
     click.secho(f'Cause: {response.reason}', italic=True)
     click.secho(f'Suggestion: {response.suggestion}', italic=True)
-
-
-@render.register
-async def _render(response: TabularResponseMessage) -> None:
-    """Renders tabular response message."""
-    click.secho(response.title)
-    click.secho(
-        tabulate(
-            tabular_data=response.data,
-            headers=response.headers,
-            tablefmt='grid',
-        )
-    )
-
-
-@render.register
-async def _render(response: InputResponseMessage) -> str:
-    """Renders input dialogue response message."""
-    click.secho(
-        'Tips: Enter - Submit and exit | Ctrl+c - Cancel and exit',
-        fg='blue',
-    )
-    click.secho('----------', fg='blue')
-    return await display_input_prompt(
-        title=response.title,
-        visible=response.visible,
-        required=response.required,
-    )
-
-
-@render.register
-async def _render(response: OptionsResponseMessage) -> typing.Any:
-    """Renders options response message."""
-    click.secho(
-        'Tips: Space - Select option | Enter - Select option and exit | Ctrl+c - Cancel and exit',
-        fg='blue',
-    )
-    click.secho('----------', fg='blue')
-    values = [(x.value, x.text) for x in response.options]
-    return await display_radio_prompt(title=response.title, values=values)

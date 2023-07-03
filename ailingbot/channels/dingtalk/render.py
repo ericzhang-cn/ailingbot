@@ -1,10 +1,8 @@
 import functools
-import json
 
 from ailingbot.chat.messages import (
     ResponseMessage,
     TextResponseMessage,
-    FallbackResponseMessage,
 )
 
 

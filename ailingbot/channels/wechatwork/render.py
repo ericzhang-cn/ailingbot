@@ -6,8 +6,6 @@ from ailingbot.chat.messages import (
     ResponseMessage,
     TextResponseMessage,
     FallbackResponseMessage,
-    InputResponseMessage,
-    OptionsResponseMessage,
 )
 
 
@@ -48,44 +46,4 @@ Suggestion: {response.suggestion}"""
         }
     }
     message_type = 'markdown'
-    return content, message_type
-
-
-@render.register
-async def _render(response: InputResponseMessage) -> tuple[dict, str]:
-    """Renders input prompt response message."""
-    content = {
-        'text': {
-            'content': response.title,
-        }
-    }
-    message_type = 'text'
-    return content, message_type
-
-
-@render.register
-async def _render(response: OptionsResponseMessage) -> tuple[dict, str]:
-    """Renders input prompt response message."""
-    content = {
-        'template_card': {
-            'card_type': 'vote_interaction',
-            'main_title': {
-                'title': response.title,
-            },
-            'task_id': response.uuid,
-            'checkbox': {
-                'question_key': response.uuid,
-                'option_list': [
-                    {
-                        'id': x.value,
-                        'text': x.text,
-                        'is_checked': False,
-                    }
-                    for x in response.options
-                ],
-                'mode': 0,
-            },
-        }
-    }
-    message_type = 'template_card'
     return content, message_type

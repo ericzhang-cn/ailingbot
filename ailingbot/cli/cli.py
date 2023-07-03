@@ -22,9 +22,6 @@ from ailingbot.chat.chatbot import ChatBot
 from ailingbot.chat.messages import (
     TextRequestMessage,
     FallbackResponseMessage,
-    OptionsResponseMessage,
-    InputRequestMessage,
-    InputResponseMessage,
     MessageScope,
 )
 from ailingbot.cli import options
@@ -133,22 +130,7 @@ async def chat(
                 conversation_id=conversation_id, message=request
             )
             request = None
-            if isinstance(response, OptionsResponseMessage):
-                selected_value = await render(response)
-                if selected_value is None:
-                    continue
-                request = InputRequestMessage(
-                    value=selected_value,
-                )
-            elif isinstance(response, InputResponseMessage):
-                text = await render(response)
-                if text is None:
-                    continue
-                request = InputRequestMessage(
-                    value=text,
-                )
-            else:
-                await render(response)
+            await render(response)
         except ailingbot.shared.errors.AilingBotError as e:
             if e.critical:
                 raise click.exceptions.ClickException(e.reason)
