@@ -595,6 +595,22 @@ app_secret = "ombrcUp****************************************GL2AwObLjILUY1MzD"
 robot_code = "ding**********owymdr"
 ```
 
+##### Slack
+
+| 配置项                | 说明                         | TOML                       | 环境变量                                  |
+|--------------------|----------------------------|----------------------------|---------------------------------------|
+| Verification Token | Slack应用的verification token | channel.verification_token | AILINGBOT_CHANNEL__VERIFICATION_TOKEN |
+| OAuth token        | Slack应用的oauth token        | channel.oauth_token        | AILINGBOT_CHANNEL__OAUTH_TOKEN        |
+
+配置示例：
+
+```toml
+[channel]
+name = "slack"
+verification_token = "HzBGs1**********39gZG2P0"
+oauth_token = "xoxb-2**********27-5**********23-if**********H1QEGUItx2Yz"
+```
+
 ## 命令行工具
 
 ### 初始化配置文件（init）
@@ -724,9 +740,19 @@ TBD
     - [x] 飞书
     - [x] 钉钉
     - [x] Slack
+- [ ] 更多请求消息类型的支持
+    - [x] 文本请求
+    - [ ] 图片请求
+    - [x] 文件请求
+- [ ] 更多响应消息类型的支持
+    - [x] 文本响应
+    - [ ] 图片响应
+    - [ ] 文件响应
+    - [ ] Markdown响应
+    - [ ] 表格响应
 - [ ] 开发更多的开箱即用的对话策略
     - [x] 多轮会话策略
-    - [ ] 文档问答策略
+    - [x] 文档问答策略
     - [ ] 数据库问答策略
     - [ ] 在线搜索问答策略
 - [ ] 基础组件抽象
