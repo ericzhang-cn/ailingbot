@@ -779,7 +779,7 @@ TBD
     - Chat policy does not use local states.
     - Only one uvicorn worker is started.
 
-# 🎯Development Plan
+# 🎯Roadmap
 
 - [ ] Provide complete usage and developer documentation.
 - [ ] Support more channels.
