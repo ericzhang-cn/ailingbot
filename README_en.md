@@ -91,7 +91,7 @@ AilingBot is an open-source engineering development framework and an all-in-one 
 IM chatbots. With AilingBot, you can:
 
 - ☕ **Code-free usage**: Quickly integrate existing AI large-scale models into mainstream IM chatbots (such as WeChat
-  Enterprise, Feishu, DingTalk, Slack etc.) to interact with AI models through IM chatbots and complete business
+  Work, Feishu, DingTalk, Slack etc.) to interact with AI models through IM chatbots and complete business
   requirements. Currently, AilingBot has built-in capabilities for multi-turn dialogue and document knowledge Q&A, and
   more capabilities will be added in the future.
 - 🛠️**Secondary development**: AilingBot provides a clear engineering architecture, interface definition, and necessary
@@ -767,8 +767,8 @@ TBD
 
 # 🤔Frequently Asked Questions
 
-- Due to the fact that enterprise WeChat does not support uploading file event callbacks, the built-in `document_qa`
-  policy cannot be used for enterprise WeChat.
+- Due to the fact that WeChat Work does not support uploading file event callbacks, the built-in `document_qa`
+  policy cannot be used for WeChat Work.
 - The webhook of each IM requires a public IP. If you do not have one, you can consider testing locally through the "
   intranet penetration" solution. Please refer to online resources for specific methods.
 
@@ -776,7 +776,7 @@ TBD
 
 - [ ] Provide complete usage and developer documentation.
 - [ ] Support more channels.
-    - [x] Enterprise WeChat
+    - [x] WeChat Work
     - [x] Feishu
     - [x] DingTalk
     - [x] Slack
