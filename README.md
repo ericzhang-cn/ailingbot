@@ -57,8 +57,8 @@
         * [配置项](#配置项)
             * [通用](#通用)
             * [内置会话策略配置](#内置会话策略配置)
-                * [lc_conversation](#lc_conversation)
-                * [lc_document_qa](#lc_document_qa)
+                * [conversation](#conversation)
+                * [document_qa](#document_qa)
             * [模型配置](#模型配置)
                 * [OpenAI](#openai)
             * [内置Channel配置](#内置channel配置)
@@ -173,7 +173,7 @@ git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
 docker run -d \
-  -e AILINGBOT_POLICY__NAME=lc_conversation \
+  -e AILINGBOT_POLICY__NAME=conversation \
   -e AILINGBOT_POLICY__HISTORY_SIZE=5 \
   -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
   -e AILINGBOT_CHANNEL__NAME=wechatwork \
@@ -250,7 +250,7 @@ git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
 docker run -d \
-  -e AILINGBOT_POLICY__NAME=lc_document_qa \
+  -e AILINGBOT_POLICY__NAME=document_qa \
   -e AILINGBOT_POLICY__CHUNK_SIZE=1000 \
   -e AILINGBOT_POLICY__CHUNK_OVERLAP=0 \
   -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
@@ -293,7 +293,7 @@ verification_token = "" # 填写真实信息
 
 ```toml
 [policy]
-name = "lc_document_qa"
+name = "document_qa"
 chunk_size = 1000
 chunk_overlap = 5
 ```
@@ -334,7 +334,7 @@ git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
 docker run -d \
-  -e AILINGBOT_POLICY__NAME=lc_conversation \
+  -e AILINGBOT_POLICY__NAME=conversation \
   -e AILINGBOT_POLICY__HISTORY_SIZE=5 \
   -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
   -e AILINGBOT_CHANNEL__NAME=dingtalk \
@@ -397,7 +397,7 @@ git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
 docker run -d \
-  -e AILINGBOT_POLICY__NAME=lc_document_qa \
+  -e AILINGBOT_POLICY__NAME=document_qa \
   -e AILINGBOT_POLICY__CHUNK_SIZE=1000 \
   -e AILINGBOT_POLICY__CHUNK_OVERLAP=0 \
   -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
@@ -438,7 +438,7 @@ oauth_token = "" # 填写真实信息
 
 ```toml
 [policy]
-name = "lc_document_qa"
+name = "document_qa"
 chunk_size = 1000
 chunk_overlap = 5
 ```
@@ -545,7 +545,7 @@ lang = "zh_CN"
 tz = "Asia/Shanghai"
 
 [policy]
-name = "lc_conversation"
+name = "conversation"
 # 更多policy配置
 
 [policy.llm]
@@ -562,9 +562,9 @@ port = 8080
 
 #### 内置会话策略配置
 
-##### lc_conversation
+##### conversation
 
-lc_conversation使用LangChain的Conversation作为会话策略，其效果为直接和LLM对话，且带有对话历史上下文，因此可以进行多轮会话。
+conversation使用LangChain的Conversation作为会话策略，其效果为直接和LLM对话，且带有对话历史上下文，因此可以进行多轮会话。
 
 | 配置项    | 说明          | TOML                | 环境变量                           |
 |--------|-------------|---------------------|--------------------------------|
@@ -573,15 +573,15 @@ lc_conversation使用LangChain的Conversation作为会话策略，其效果为�
 配置示例：
 
 ```toml
-# 使用lc_conversation策略，保留5轮历史会话
+# 使用conversation策略，保留5轮历史会话
 [policy]
-name = "lc_conversation"
+name = "conversation"
 history_size = 5
 ```
 
-##### lc_document_qa
+##### document_qa
 
-lc_document_qa使用LangChain的[Stuff](https://python.langchain.com/docs/modules/chains/document/stuff)作为对话策略。
+document_qa使用LangChain的[Stuff](https://python.langchain.com/docs/modules/chains/document/stuff)作为对话策略。
 用户可上传一个文档，然后针对文档内容进行提问。
 
 | 配置项     | 说明                                 | TOML                 | 环境变量                            |
@@ -592,9 +592,9 @@ lc_document_qa使用LangChain的[Stuff](https://python.langchain.com/docs/module
 配置示例：
 
 ```toml
-# 使用lc_document_qa策略，chunk_size和chunk_overlap分别配置为1000和0
+# 使用document_qa策略，chunk_size和chunk_overlap分别配置为1000和0
 [policy]
-name = "lc_document_qa"
+name = "document_qa"
 chunk_size = 1000
 chunk_overlap = 0
 ```
@@ -807,7 +807,7 @@ TBD
 
 # 🤔常见问题
 
-- 由于企业微信不支持上传文件事件的回调，因此企业微信暂时不能使用内置的lc_document_qa策略
+- 由于企业微信不支持上传文件事件的回调，因此企业微信暂时不能使用内置的document_qa策略
 - 各个IM的webhook需要公网IP，如果你暂时没有，可以考虑通过"内网穿透"方案在本地测试，具体方法请参考网上资料
 
 # 🎯发展计划

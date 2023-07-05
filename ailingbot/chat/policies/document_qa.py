@@ -1,25 +1,21 @@
 import copy
 import tempfile
 
-from langchain import ConversationChain
 from langchain.chains import RetrievalQA
 from langchain.chains.base import Chain
 from langchain.document_loaders import PyPDFLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.llms.loading import load_llm_from_config
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.memory.chat_memory import BaseChatMemory
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.vectorstores.base import VectorStoreRetriever
 
-import ailingbot
 from ailingbot.chat.messages import (
     RequestMessage,
     ResponseMessage,
     TextRequestMessage,
-    TextResponseMessage,
     FallbackResponseMessage,
+    TextResponseMessage,
     FileRequestMessage,
 )
 from ailingbot.chat.policy import ChatPolicy
@@ -27,56 +23,7 @@ from ailingbot.config import settings
 from ailingbot.shared.errors import ChatPolicyError
 
 
-class LCConversationChatPolicy(ChatPolicy):
-    """Having a direct conversation with a large language model."""
-
-    def __init__(
-        self,
-        *,
-        debug: bool = False,
-    ):
-        super(LCConversationChatPolicy, self).__init__(
-            debug=debug,
-        )
-
-        llm_config = copy.deepcopy(settings.policy.llm)
-        llm = load_llm_from_config(llm_config)
-        self.chain = ConversationChain(llm=llm, verbose=debug)
-        self.history_size = settings.policy.get('history_size', 5)
-        self.memories: dict[str, BaseChatMemory] = {}
-
-    async def _load_memory(self, *, conversation_id: str) -> BaseChatMemory:
-        """Load memory for conversation. Create a new memory if not exists.
-
-        :param conversation_id: Conversation ID.
-        :type conversation_id: str
-        :return: Chat memory.
-        :rtype: BaseChatMemory
-        """
-        if conversation_id not in self.memories:
-            self.memories[conversation_id] = ConversationBufferWindowMemory(
-                k=self.history_size
-            )
-        return self.memories[conversation_id]
-
-    async def respond(
-        self, *, conversation_id: str, message: RequestMessage
-    ) -> ResponseMessage:
-        if not isinstance(message, TextRequestMessage):
-            response = FallbackResponseMessage()
-            response.reason = '不支持的消息类型'
-        else:
-            if conversation_id not in self.chain:
-                self.chain.memory = await self._load_memory(
-                    conversation_id=conversation_id
-                )
-            response = TextResponseMessage()
-            response.text = await self.chain.arun(message.text)
-
-        return response
-
-
-class LCDocumentQAPolicy(ChatPolicy):
+class DocumentQAPolicy(ChatPolicy):
     """Question-Answering based on documents."""
 
     def __init__(
@@ -84,7 +31,7 @@ class LCDocumentQAPolicy(ChatPolicy):
         *,
         debug: bool = False,
     ):
-        super(LCDocumentQAPolicy, self).__init__(
+        super().__init__(
             debug=debug,
         )
 
@@ -99,7 +46,7 @@ class LCDocumentQAPolicy(ChatPolicy):
     ) -> VectorStoreRetriever:
         """Load document and build index."""
         if file_type.lower() != 'pdf':
-            raise ailingbot.shared.errors.ChatPolicyError(
+            raise ChatPolicyError(
                 reason='目前只支持PDF文档',
                 suggestion='请上传PDF文档',
             )

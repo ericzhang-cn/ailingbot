@@ -227,7 +227,7 @@ async def init(silence: bool, overwrite: bool):
     }
     if silence:
         config['policy'] = {
-            'name': 'lc_conversation',
+            'name': 'conversation',
             'history_size': 5,
             'llm': {
                 '_type': 'openai',
@@ -250,16 +250,16 @@ async def init(silence: bool, overwrite: bool):
             values=[
                 (x, x)
                 for x in [
-                    'lc_conversation',
-                    'lc_document_qa',
+                    'conversation',
+                    'document_qa',
                     'Configure Later',
                 ]
             ],
             cancel_value='Configure Later',
         )
-        if policy == 'lc_conversation':
+        if policy == 'conversation':
             config['policy'] = {
-                'name': 'lc_conversation',
+                'name': 'conversation',
                 'history_size': 5,
                 'llm': {
                     '_type': 'openai',
@@ -268,9 +268,9 @@ async def init(silence: bool, overwrite: bool):
                     'temperature': 0,
                 },
             }
-        elif policy == 'lc_document_qa':
+        elif policy == 'document_qa':
             config['policy'] = {
-                'name': 'lc_document_qa',
+                'name': 'document_qa',
                 'chunk_size': 1000,
                 'chunk_overlap': 0,
                 'llm': {
