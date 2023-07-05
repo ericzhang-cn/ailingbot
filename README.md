@@ -83,7 +83,7 @@
     * [Developing Chat Policy](#developing-chat-policy)
     * [Developing Channel](#developing-channel)
 * [<g-emoji class="g-emoji" alias="thinking" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f914.png">🤔</g-emoji>Frequently Asked Questions](#frequently-asked-questions)
-* [🎯Development Plan](#development-plan)
+* [🎯Roadmap](#roadmap)
 
 # What is AilingBot
 
