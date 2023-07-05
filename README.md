@@ -1,3 +1,8 @@
+🇨🇳[简体中文](https://github.com/ericzhang-cn/ailingbot/blob/main/README.md)
+🇬🇧[English](https://github.com/ericzhang-cn/ailingbot/blob/main/README_en.md)
+
+---
+
 ![Python package workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/python-package.yml/badge.svg)
 ![Pylint workflow](https://github.com/ericzhang-cn/ailingbot/actions/workflows/pylint.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -8,8 +13,7 @@
 
 <p align="center"><b>AilingBot - 一站式解决方案，为你的IM机器人接入AI强大能力。</b></p>
 
-目录
-=================
+# 目录
 
 * [AilingBot是什么](#ailingbot是什么)
 * [特点](#特点)
@@ -90,7 +94,7 @@
 
 AilingBot是一个开源的工程开发框架，同时也是IM机器人接入AI模型的一站式解决方案。通过AilingBot你可以：
 
-- ☕**零代码使用**：快速将现有AI大模型能力接入主流IM机器人（如企业微信、飞书、钉钉等），实现通过IM机器人与AI大模型交互以完成业务需求。目前内置了多轮对话和文档知识问答两种能力，未来将内置更多能力
+- ☕**零代码使用**：快速将现有AI大模型能力接入主流IM机器人（如企业微信、飞书、钉钉、Slack等），实现通过IM机器人与AI大模型交互以完成业务需求。目前内置了多轮对话和文档知识问答两种能力，未来将内置更多能力
 - 🛠️**二次开发**：AilingBot提供了一套清晰的工程架构、接口定义和必需基础组件，无需从头开始重复开发大模型服务的工程框架，只需实现自己Chat
   Policy，并通过一些简单的配置，就能完成端到端的AI模型对IM机器人的赋能。同时也支持通过开发自己的Channel扩展到你自己的端（如自己的IM、Web应用或移动端应用）
 
@@ -462,7 +466,7 @@ ailingbot serve
 最后我们需要去Slack的管理后台，将webhook地址配置好。
 飞书Webhook的URL为：`http(s)://你的公网IP:8080/webhook/slack/event/`
 
-完成以上配置后，就可以在飞书中找到机器人，进行对话了：
+完成以上配置后，就可以在Slack中找到机器人，进行对话了：
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/slack-screenshot.png" alt="Slack机器人" width="1000"/>
@@ -536,7 +540,7 @@ AilingBot的配置可以通过两种方式：
 | Channel名称 | 预置Channel名称                                                                            | channel.name         | AILINGBOT_CHANNEL__NAME         |
 | Webhook路径 | 非预置Channel webhook的完整class路径                                                           | channel.webhook_name | AILINGBOT_CHANNEL__WEBHOOK_NAME |
 | Agent路径   | 非预置Channel agent的完整class路径                                                             | channel.agent_name   | AILINGBOT_CHANNEL__AGENT_NAME   |
-| Uvicorn配置 | 所有uvicorn配置（参考：[uvicorn settings](https://www.uvicorn.org/settings/)），这部分配置会透传给uvicorn | uvicorn.*            | AILINGBOT_UVICORN__*   |
+| Uvicorn配置 | 所有uvicorn配置（参考：[uvicorn settings](https://www.uvicorn.org/settings/)），这部分配置会透传给uvicorn | uvicorn.*            | AILINGBOT_UVICORN__*            |
 
 配置示例：
 
