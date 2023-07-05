@@ -771,6 +771,13 @@ TBD
   policy cannot be used for WeChat Work.
 - The webhook of each IM requires a public IP. If you do not have one, you can consider testing locally through the "
   intranet penetration" solution. Please refer to online resources for specific methods.
+- We expect the chat policy to be stateless, and the state should be stored externally. However, in specific
+  implementations, the policy may still have local states (such as storing conversation history in local variables).
+  Therefore, when uvicorn has multiple worker processes, these local states cannot be shared because each process has a
+  separate chat policy instance, and a request from the same user may be responded to by different workers, leading to
+  unexpected behavior. To avoid this, please ensure that at least one of the following two conditions is met:
+    - Chat policy does not use local states.
+    - Only one uvicorn worker is started.
 
 # 🎯Development Plan
 
@@ -795,6 +802,7 @@ TBD
     - [x] Document question and answer policy
     - [ ] Database question and answer policy
     - [ ] Online search question and answer policy
+- [ ] Support calling standalone chat policy services through HTTP.
 - [ ] Abstract basic components
     - [ ] Large language model
     - [ ] Knowledge base
