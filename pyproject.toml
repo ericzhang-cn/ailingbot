@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ailingbot"
-version = "0.0.6"
+version = "0.0.7"
 description = "An all-in-one solution to empower your IM bot with AI."
 authors = ["ericzhang-cn <ericzhang.buaa@gmail.com>"]
 readme = "README.md"
