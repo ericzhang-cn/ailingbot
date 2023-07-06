@@ -526,8 +526,6 @@ The main processing flow of AilingBot is as follows:
 - **LLM**: Large language model, such as OpenAI's ChatGPT and open ChatGLM, are all different large language models. The
   large language model is a key component for implementing AI capabilities.
 
-Translation:
-
 ## Configuration
 
 ### Configuration Methods
