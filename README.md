@@ -17,42 +17,48 @@
 
 * [What is AilingBot](#what-is-ailingbot)
 * [Features](#features)
-* [🚀 Quick Start](#-quick-start)
+* [Quick Start](#-quick-start)
     * [Start an AI chatbot in 5 minutes](#start-an-ai-chatbot-in-5-minutes)
         * [Using Docker](#using-docker)
         * [Using PIP](#using-pip)
             * [Installation](#installation)
             * [Generate Configuration File](#generate-configuration-file)
             * [Start the Chatbot](#start-the-chatbot)
-    * [Integrating with WeChat Work](#integrating-with-wechat-work)
+    * [Start API Service](#start-api-service)
         * [Using Docker](#using-docker-1)
         * [Using PIP](#using-pip-1)
             * [Installation](#installation-1)
             * [Generate Configuration File](#generate-configuration-file-1)
-            * [Modify Configuration File](#modify-configuration-file)
             * [Start the Service](#start-the-service)
-    * [Integrating with Feishu](#integrating-with-feishu)
+    * [Integrating with WeChat Work](#integrating-with-wechat-work)
         * [Using Docker](#using-docker-2)
         * [Using PIP](#using-pip-2)
             * [Installation](#installation-2)
             * [Generate Configuration File](#generate-configuration-file-2)
-            * [Modify Configuration File](#modify-configuration-file-1)
+            * [Modify Configuration File](#modify-configuration-file)
             * [Start the Service](#start-the-service-1)
-    * [Integrating with DingTalk](#integrating-with-dingtalk)
+    * [Integrating with Feishu](#integrating-with-feishu)
         * [Using Docker](#using-docker-3)
         * [Using PIP](#using-pip-3)
             * [Installation](#installation-3)
             * [Generate Configuration File](#generate-configuration-file-3)
-            * [Modify Configuration File](#modify-configuration-file-2)
+            * [Modify Configuration File](#modify-configuration-file-1)
             * [Start the Service](#start-the-service-2)
-    * [Integrating with Slack](#integrating-with-slack)
+    * [Integrating with DingTalk](#integrating-with-dingtalk)
         * [Using Docker](#using-docker-4)
         * [Using PIP](#using-pip-4)
             * [Installation](#installation-4)
             * [Generate Configuration File](#generate-configuration-file-4)
-            * [Modify Configuration File](#modify-configuration-file-3)
+            * [Modify Configuration File](#modify-configuration-file-2)
             * [Start the Service](#start-the-service-3)
-* [📖User Guide](#user-guide)
+    * [Integrating with Slack](#integrating-with-slack)
+        * [Using Docker](#using-docker-5)
+        * [Using PIP](#using-pip-5)
+            * [Installation](#installation-5)
+            * [Generate Configuration File](#generate-configuration-file-5)
+            * [Modify Configuration File](#modify-configuration-file-3)
+            * [Start the Service](#start-the-service-4)
+* [<g-emoji class="g-emoji" alias="book" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4d6.png">📖</g-emoji>User Guide](#user-guide)
     * [Main Process](#main-process)
     * [Main Concepts](#main-concepts)
     * [Configuration](#configuration)
@@ -78,12 +84,16 @@
         * [Start Webhook Service (serve)](#start-webhook-service-serve)
             * [Usage](#usage-3)
             * [Options](#options-3)
-* [💻Development Guide](#development-guide)
+        * [Start API Service (api)](#start-api-service-api)
+            * [Usage](#usage-4)
+            * [Options](#options-4)
+    * [<g-emoji class="g-emoji" alias="electric_plug" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f50c.png">🔌</g-emoji>API](#api)
+* [<g-emoji class="g-emoji" alias="computer" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4bb.png">💻</g-emoji>Development Guide](#development-guide)
     * [Development Guidelines](#development-guidelines)
     * [Developing Chat Policy](#developing-chat-policy)
     * [Developing Channel](#developing-channel)
 * [<g-emoji class="g-emoji" alias="thinking" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f914.png">🤔</g-emoji>Frequently Asked Questions](#frequently-asked-questions)
-* [🎯Roadmap](#roadmap)
+* [<g-emoji class="g-emoji" alias="dart" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f3af.png">🎯</g-emoji>Roadmap](#roadmap)
 
 # What is AilingBot
 
@@ -175,6 +185,76 @@ Start the chatbot with the following command:
 ailingbot chat
 ```
 
+## Start API Service
+
+### Using Docker
+
+```shell
+git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
+cd ailingbot
+docker build -t ailingbot .
+docker run -it --rm \
+  -e  AILINGBOT_POLICY__LLM__OPENAI_API_KEY={your OpenAI API key} \
+  ailingbot poetry run ailingbot api
+```
+
+### Using PIP
+
+#### Installation
+
+```shell
+pip install ailingbot
+```
+
+#### Generate Configuration File
+
+Same as starting the command line bot.
+
+#### Start the Service
+
+Start the bot using the following command:
+
+```shell
+ailingbot api
+```
+
+Now, enter `http://localhost:8080/docs` in your browser to see the API documentation. (If it is not a local start,
+please enter `http://{your public IP}:8080/docs`)
+
+<p align="center">
+    <img src="./img/swagger.png" alt="Swagger API Documentation"/>
+</p>
+
+Here is an example request:
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8080/chat/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "text": "你好"
+}'
+```
+
+And the response:
+
+```json
+{
+  "type": "text",
+  "conversation_id": "default_conversation",
+  "uuid": "afb35218-2978-404a-ab39-72a9db6f303b",
+  "ack_uuid": "3f09933c-e577-49a5-8f56-fa328daa136f",
+  "receiver_id": "anonymous",
+  "scope": "user",
+  "meta": {},
+  "echo": {},
+  "text": "你好！很高兴和你聊天。有什么我可以帮助你的吗？",
+  "reason": null,
+  "suggestion": null
+}
+```
+
 ## Integrating with WeChat Work
 
 Here's a guide on how to quickly integrate the chatbot with WeChat Work.
@@ -186,17 +266,20 @@ git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
 docker run -d \
-  -e AILINGBOT_POLICY__NAME=conversation \
-  -e AILINGBOT_POLICY__HISTORY_SIZE=5 \
-  -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={your OpenAI API key} \
-  -e AILINGBOT_CHANNEL__NAME=wechatwork \
-  -e AILINGBOT_CHANNEL__CORPID={your WeChat Work robot's corpid} \
-  -e AILINGBOT_CHANNEL__CORPSECRET={your WeChat Work robot's corpsecret} \
-  -e AILINGBOT_CHANNEL__AGENTID={your WeChat Work robot's agentid} \
-  -e AILINGBOT_CHANNEL__TOKEN={your WeChat Work robot's webhook token} \
-  -e AILINGBOT_CHANNEL__AES_KEY={your WeChat Work robot's webhook aes_key} \
-  -p 8080:8080
-  ailingbot poetry run ailingbot serve
+-e AILINGBOT_POLICY__NAME=conversation \
+-e AILINGBOT_POLICY__HISTORY_SIZE=5 \
+-e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={your OpenAI API key
+} \
+-e AILINGBOT_CHANNEL__NAME=wechatwork \
+-e AILINGBOT_CHANNEL__CORPID={your WeChat Work robot's corpid} \
+-e AILINGBOT_CHANNEL__CORPSECRET={
+your WeChat Work robot's corpsecret} \
+-e AILINGBOT_CHANNEL__AGENTID={your WeChat Work robot's agentid} \
+-e AILINGBOT_CHANNEL__TOKEN={
+your WeChat Work robot's webhook token} \
+-e AILINGBOT_CHANNEL__AES_KEY={your WeChat Work robot's webhook aes_key} \
+-p 8080: 8080
+ailingbot poetry run ailingbot serve
 ```
 
 ### Using PIP
@@ -641,8 +724,6 @@ model_name = "gpt-3.5-turbo" # Corresponding environment variable: AILINGBOT_POL
 openai_api_key = "sk-pd8I'm sorry, it seems like your message got cut off. Can you please provide me with more information or clarify your request?
 ```
 
-Translation:
-
 ## Command Line Tools
 
 ### Initialize Configuration File (init)
@@ -747,7 +828,39 @@ Options:
 | --log-level | The minimum severity level from which logged messages should be sent to. | String | By default, all log levels will be displayed (TRACE).       |
 | --log-file  | The location where logs are output.                                      | String | By default, logs will be output to standard error (STDERR). |
 
-Translation:
+### Start API Service (api)
+
+The `api` command starts the API HTTP server.
+
+#### Usage
+
+```text
+Usage: ailingbot api [OPTIONS]
+
+Run endpoint server.
+
+Options:
+  --log-level [TRACE|DEBUG|INFO|SUCCESS|WARNING|ERROR|CRITICAL]
+                                  The minimum severity level from which logged
+                                  messages should be sent to(read from
+                                  environment variable AILINGBOT_LOG_LEVEL if
+                                  is not passed into).  [default: TRACE]
+  --log-file TEXT                 STDOUT, STDERR, or file path(read from
+                                  environment variable AILINGBOT_LOG_FILE if
+                                  is not passed into).  [default: STDERR]
+  --help                          Show this message and exit.
+```
+
+#### Options
+
+| Option      | Description                                                        | Type   | Remarks                                                 |
+|-------------|--------------------------------------------------------------------|--------|---------------------------------------------------------|
+| --log-level | Display log level, which will display logs at this level and above | String | By default, all levels are displayed (TRACE)            |
+| --log-file  | Log output location                                                | String | By default, logs are printed to standard error (STDERR) |
+
+## 🔌API
+
+TBD
 
 # 💻Development Guide
 

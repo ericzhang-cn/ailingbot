@@ -24,34 +24,40 @@
             * [安装](#安装)
             * [生成配置文件](#生成配置文件)
             * [启动机器人](#启动机器人)
-    * [接入企业微信](#接入企业微信)
+    * [启动API服务](#启动api服务)
         * [通过Docker](#通过docker-1)
         * [通过PIP](#通过pip-1)
             * [安装](#安装-1)
             * [生成配置文件](#生成配置文件-1)
-            * [修改配置文件](#修改配置文件)
             * [启动服务](#启动服务)
-    * [接入飞书](#接入飞书)
+    * [接入企业微信](#接入企业微信)
         * [通过Docker](#通过docker-2)
         * [通过PIP](#通过pip-2)
             * [安装](#安装-2)
             * [生成配置文件](#生成配置文件-2)
-            * [修改配置文件](#修改配置文件-1)
+            * [修改配置文件](#修改配置文件)
             * [启动服务](#启动服务-1)
-    * [接入钉钉](#接入钉钉)
+    * [接入飞书](#接入飞书)
         * [通过Docker](#通过docker-3)
         * [通过PIP](#通过pip-3)
             * [安装](#安装-3)
             * [生成配置文件](#生成配置文件-3)
-            * [修改配置文件](#修改配置文件-2)
+            * [修改配置文件](#修改配置文件-1)
             * [启动服务](#启动服务-2)
-    * [接入Slack](#接入slack)
+    * [接入钉钉](#接入钉钉)
         * [通过Docker](#通过docker-4)
         * [通过PIP](#通过pip-4)
             * [安装](#安装-4)
             * [生成配置文件](#生成配置文件-4)
-            * [修改配置文件](#修改配置文件-3)
+            * [修改配置文件](#修改配置文件-2)
             * [启动服务](#启动服务-3)
+    * [接入Slack](#接入slack)
+        * [通过Docker](#通过docker-5)
+        * [通过PIP](#通过pip-5)
+            * [安装](#安装-5)
+            * [生成配置文件](#生成配置文件-5)
+            * [修改配置文件](#修改配置文件-3)
+            * [启动服务](#启动服务-4)
 * [<g-emoji class="g-emoji" alias="book" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4d6.png">📖</g-emoji>使用指南](#使用指南)
     * [主要流程](#主要流程)
     * [主要概念](#主要概念)
@@ -83,12 +89,16 @@
         * [启动Webhook服务（serve）](#启动webhook服务serve)
             * [使用方法](#使用方法-3)
             * [Options](#options-3)
-* [💻开发指南](#开发指南)
+        * [启动API服务（api）](#启动api服务api)
+            * [使用方法](#使用方法-4)
+            * [Options](#options-4)
+    * [<g-emoji class="g-emoji" alias="electric_plug" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f50c.png">🔌</g-emoji>API](#api)
+* [<g-emoji class="g-emoji" alias="computer" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4bb.png">💻</g-emoji>开发指南](#开发指南)
     * [开发总则](#开发总则)
     * [开发对话策略](#开发对话策略)
     * [开发Channel](#开发channel)
 * [<g-emoji class="g-emoji" alias="thinking" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f914.png">🤔</g-emoji>常见问题](#常见问题)
-* [🎯发展计划](#发展计划)
+* [<g-emoji class="g-emoji" alias="dart" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f3af.png">🎯</g-emoji>发展计划](#发展计划)
 
 # AilingBot是什么
 
@@ -164,6 +174,75 @@ temperature = 0
 
 ```shell
 ailingbot chat
+```
+
+## 启动API服务
+
+### 通过Docker
+
+```shell
+git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
+cd ailingbot
+docker build -t ailingbot .
+docker run -it --rm \
+  -e  AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
+  ailingbot poetry run ailingbot api
+```
+
+### 通过PIP
+
+#### 安装
+
+```shell
+pip install ailingbot
+```
+
+#### 生成配置文件
+
+与启动命令行机器人做法相同。
+
+#### 启动服务
+
+通过如下命令启动机器人：
+
+```shell
+ailingbot api
+```
+
+此时在浏览器输入 `http://localshot:8080/docs` 即可看到API文档。（如是非本地启动，请输入 `http://{你的公网IP}:8080/docs`）
+
+<p align="center">
+    <img src="./img/swagger.png" alt="Swagger API文档"/>
+</p>
+
+请求示例如下：
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8080/chat/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "text": "你好"
+}'
+```
+
+得到响应：
+
+```json
+{
+  "type": "text",
+  "conversation_id": "default_conversation",
+  "uuid": "afb35218-2978-404a-ab39-72a9db6f303b",
+  "ack_uuid": "3f09933c-e577-49a5-8f56-fa328daa136f",
+  "receiver_id": "anonymous",
+  "scope": "user",
+  "meta": {},
+  "echo": {},
+  "text": "你好！很高兴和你聊天。有什么我可以帮助你的吗？",
+  "reason": null,
+  "suggestion": null
+}
 ```
 
 ## 接入企业微信
@@ -795,6 +874,40 @@ Options:
 | --log-level | 显示日志级别，将显示此级别及以上的日志 | String | 默认显示所有级别（TRACE）       |
 | --log-file  | 日志输出位置              | String | 默认情况日志打印到标准错误（STDERR） |
 
+### 启动API服务（api）
+
+`api`命令启动API HTTP server。
+
+#### 使用方法
+
+```text
+Usage: ailingbot api [OPTIONS]
+
+  Run endpoint server.
+
+Options:
+  --log-level [TRACE|DEBUG|INFO|SUCCESS|WARNING|ERROR|CRITICAL]
+                                  The minimum severity level from which logged
+                                  messages should be sent to(read from
+                                  environment variable AILINGBOT_LOG_LEVEL if
+                                  is not passed into).  [default: TRACE]
+  --log-file TEXT                 STDOUT, STDERR, or file path(read from
+                                  environment variable AILINGBOT_LOG_FILE if
+                                  is not passed into).  [default: STDERR]
+  --help                          Show this message and exit.
+```
+
+#### Options
+
+| Option      | 说明                  | 类型     | 备注                    |
+|-------------|---------------------|--------|-----------------------|
+| --log-level | 显示日志级别，将显示此级别及以上的日志 | String | 默认显示所有级别（TRACE）       |
+| --log-file  | 日志输出位置              | String | 默认情况日志打印到标准错误（STDERR） |
+
+## 🔌API
+
+TBD
+
 # 💻开发指南
 
 ## 开发总则
@@ -848,7 +961,7 @@ TBD
     - [ ] Tools
 - [ ] 支持本地模型部署
     - [ ] ChatGLM-6B
-- [ ] 支持通过API调用
+- [x] 支持通过API调用
 - [ ] Web管理后台及可视化配置管理
 - [x] 提供基于Docker容器的部署能力
 - [ ] 增强系统的可观测性和可治理性

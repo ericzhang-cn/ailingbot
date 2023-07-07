@@ -17,6 +17,7 @@ from prompt_toolkit.formatted_text import FormattedText
 from rich.console import Console
 
 import ailingbot.shared.errors
+from ailingbot import endpoint
 from ailingbot.channels.channel import ChannelWebhookFactory
 from ailingbot.chat.chatbot import ChatBot
 from ailingbot.chat.messages import (
@@ -320,6 +321,23 @@ async def init(silence: bool, overwrite: bool):
             fg='green',
         )
     )
+
+
+@command_line_tools.command(name='api', help='Run endpoint server.')
+@options.log_level_option
+@options.log_file_option
+@_coro_cmd
+async def serve(
+    log_level: str,
+    log_file: str,
+):
+    _set_logger(sink=log_file, level=log_level)
+
+    config = uvicorn.Config(
+        app='ailingbot.endpoint.server:app', **settings.uvicorn
+    )
+    server = uvicorn.Server(config)
+    await server.serve()
 
 
 if __name__ == '__main__':
