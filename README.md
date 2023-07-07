@@ -222,7 +222,7 @@ Now, enter `http://localhost:8080/docs` in your browser to see the API documenta
 please enter `http://{your public IP}:8080/docs`)
 
 <p align="center">
-    <img src="./img/swagger.png" alt="Swagger API Documentation"/>
+    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/swagger.png" alt="Swagger API Documentation"/>
 </p>
 
 Here is an example request:
@@ -920,7 +920,7 @@ TBD
     - [ ] Tools
 - [ ] Support local model deployment.
     - [ ] ChatGLM-6B
-- [ ] Support API invocation.
+- [x] Support API.
 - [ ] Web management background and visual configuration management.
 - [x] Provide deployment capability based on Docker containers.
 - [ ] Enhance the observability and controllability of the system.

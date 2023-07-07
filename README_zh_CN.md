@@ -212,7 +212,7 @@ ailingbot api
 此时在浏览器输入 `http://localshot:8080/docs` 即可看到API文档。（如是非本地启动，请输入 `http://{你的公网IP}:8080/docs`）
 
 <p align="center">
-    <img src="./img/swagger.png" alt="Swagger API文档"/>
+    <img src="https://raw.githubusercontent.com/ericzhang-cn/ailingbot/main/img/swagger.png" alt="Swagger API文档"/>
 </p>
 
 请求示例如下：
