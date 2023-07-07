@@ -185,7 +185,8 @@ git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
 docker run -it --rm \
-  -e  AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
+  -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={你的OpenAI API key} \
+  -p 8080:8080 \
   ailingbot poetry run ailingbot api
 ```
 
@@ -265,7 +266,7 @@ docker run -d \
   -e AILINGBOT_CHANNEL__AGENTID={你的企业微信机器人agentid} \
   -e AILINGBOT_CHANNEL__TOKEN={你的企业微信机器人webhook token} \
   -e AILINGBOT_CHANNEL__AES_KEY={你的企业微信机器人webhook aes_key} \
-  -p 8080:8080
+  -p 8080:8080 \
   ailingbot poetry run ailingbot serve
 ```
 
@@ -342,7 +343,7 @@ docker run -d \
   -e AILINGBOT_CHANNEL__APP_ID={你的飞书机器人app id} \
   -e AILINGBOT_CHANNEL__APP_SECRET={你的飞书机器人app secret} \
   -e AILINGBOT_CHANNEL__VERIFICATION_TOKEN={你的飞书机器人webhook verification token} \
-  -p 8080:8080
+  -p 8080:8080 \
   ailingbot poetry run ailingbot serve
 ```
 
@@ -424,7 +425,7 @@ docker run -d \
   -e AILINGBOT_CHANNEL__APP_KEY={你的钉钉机器人app key} \
   -e AILINGBOT_CHANNEL__APP_SECRET={你的钉钉机器人app secret} \
   -e AILINGBOT_CHANNEL__ROBOT_CODE={你的钉钉机器人robot code} \
-  -p 8080:8080
+  -p 8080:8080 \
   ailingbot poetry run ailingbot serve
 ```
 
@@ -488,7 +489,7 @@ docker run -d \
   -e AILINGBOT_CHANNEL__NAME=slack \
   -e AILINGBOT_CHANNEL__VERIFICATION_TOKEN={你的Slack App webhook verification token} \
   -e AILINGBOT_CHANNEL__OAUTH_TOKEN={你的Slack App oauth token} \
-  -p 8080:8080
+  -p 8080:8080 \
   ailingbot poetry run ailingbot serve
 ```
 

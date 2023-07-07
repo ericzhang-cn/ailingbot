@@ -194,7 +194,8 @@ git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
 docker run -it --rm \
-  -e  AILINGBOT_POLICY__LLM__OPENAI_API_KEY={your OpenAI API key} \
+  -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={your OpenAI API key} \
+  -p 8080:8080 \
   ailingbot poetry run ailingbot api
 ```
 
@@ -266,20 +267,17 @@ git clone https://github.com/ericzhang-cn/ailingbot.git ailingbot
 cd ailingbot
 docker build -t ailingbot .
 docker run -d \
--e AILINGBOT_POLICY__NAME=conversation \
--e AILINGBOT_POLICY__HISTORY_SIZE=5 \
--e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={your OpenAI API key
-} \
--e AILINGBOT_CHANNEL__NAME=wechatwork \
--e AILINGBOT_CHANNEL__CORPID={your WeChat Work robot's corpid} \
--e AILINGBOT_CHANNEL__CORPSECRET={
-your WeChat Work robot's corpsecret} \
--e AILINGBOT_CHANNEL__AGENTID={your WeChat Work robot's agentid} \
--e AILINGBOT_CHANNEL__TOKEN={
-your WeChat Work robot's webhook token} \
--e AILINGBOT_CHANNEL__AES_KEY={your WeChat Work robot's webhook aes_key} \
--p 8080: 8080
-ailingbot poetry run ailingbot serve
+  -e AILINGBOT_POLICY__NAME=conversation \
+  -e AILINGBOT_POLICY__HISTORY_SIZE=5 \
+  -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={your OpenAI API key} \
+  -e AILINGBOT_CHANNEL__NAME=wechatwork \
+  -e AILINGBOT_CHANNEL__CORPID={your WeChat Work corpid} \
+  -e AILINGBOT_CHANNEL__CORPSECRET={your WeChat Work corpsecret} \
+  -e AILINGBOT_CHANNEL__AGENTID={your WeChat Work agentid} \
+  -e AILINGBOT_CHANNEL__TOKEN={your WeChat Work webhook token} \
+  -e AILINGBOT_CHANNEL__AES_KEY={your WeChat Work webhook aes_key} \
+  -p 8080:8080 \
+  ailingbot poetry run ailingbot serve
 ```
 
 ### Using PIP
@@ -354,10 +352,10 @@ docker run -d \
   -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={your OpenAI API key} \
   -e AILINGBOT_POLICY__LLM__MODEL_NAME=gpt-3.5-turbo-16k \
   -e AILINGBOT_CHANNEL__NAME=feishu \
-  -e AILINGBOT_CHANNEL__APP_ID={your Feishu robot's app id} \
-  -e AILINGBOT_CHANNEL__APP_SECRET={your Feishu robot's app secret} \
-  -e AILINGBOT_CHANNEL__VERIFICATION_TOKEN={your Feishu robot's webhook verification token} \
-  -p 8080:8080
+  -e AILINGBOT_CHANNEL__APP_ID={your Feishu app id} \
+  -e AILINGBOT_CHANNEL__APP_SECRET={your Feishu app secret} \
+  -e AILINGBOT_CHANNEL__VERIFICATION_TOKEN={your Feishu webhook verification token} \
+  -p 8080:8080 \
   ailingbot poetry run ailingbot serve
 ```
 
@@ -438,10 +436,10 @@ docker run -d \
   -e AILINGBOT_POLICY__HISTORY_SIZE=5 \
   -e AILINGBOT_POLICY__LLM__OPENAI_API_KEY={your OpenAI API key} \
   -e AILINGBOT_CHANNEL__NAME=dingtalk \
-  -e AILINGBOT_CHANNEL__APP_KEY={your DingTalk robot's app key} \
-  -e AILINGBOT_CHANNEL__APP_SECRET={your DingTalk robot's app secret} \
-  -e AILINGBOT_CHANNEL__ROBOT_CODE={your DingTalk robot's robot code} \
-  -p 8080:8080
+  -e AILINGBOT_CHANNEL__APP_KEY={your DingTalk app key} \
+  -e AILINGBOT_CHANNEL__APP_SECRET={your DingTalk app secret} \
+  -e AILINGBOT_CHANNEL__ROBOT_CODE={your DingTalk robot code} \
+  -p 8080:8080 \
   ailingbot poetry run ailingbot serve
 ```
 
@@ -507,7 +505,7 @@ docker run -d \
   -e AILINGBOT_CHANNEL__NAME=slack \
   -e AILINGBOT_CHANNEL__VERIFICATION_TOKEN={your Slack App webhook verification token} \
   -e AILINGBOT_CHANNEL__OAUTH_TOKEN={your Slack App oauth token} \
-  -p 8080:8080
+  -p 8080:8080 \
   ailingbot poetry run ailingbot serve
 ```
 
