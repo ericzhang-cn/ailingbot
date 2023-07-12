@@ -719,7 +719,7 @@ The model configuration is consistent with LangChain. The following is an exampl
 [policy.llm]
 _type = "openai" # Corresponding environment variable: AILINGBOT_POLICY__LLM___TYPE
 model_name = "gpt-3.5-turbo" # Corresponding environment variable: AILINGBOT_POLICY__LLM__MODEL_NAME
-openai_api_key = "sk-pd8I'm sorry, it seems like your message got cut off. Can you please provide me with more information or clarify your request?
+openai_api_key = "sk-pd*****************************aAb" # Corresponding environment variable: AILINGBOT_POLICY__LLM__OPENAI_API_KEY
 ```
 
 ## Command Line Tools
@@ -919,7 +919,7 @@ TBD
 - [ ] Support local model deployment.
     - [ ] ChatGLM-6B
 - [x] Support API.
-- [ ] Web management background and visual configuration management.
+- [ ] Web management dashboard.
 - [x] Provide deployment capability based on Docker containers.
 - [ ] Enhance the observability and controllability of the system.
 - [ ] Complete test cases.
