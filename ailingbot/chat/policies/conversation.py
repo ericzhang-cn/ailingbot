@@ -55,10 +55,9 @@ class ConversationChatPolicy(ChatPolicy):
             response = FallbackResponseMessage()
             response.reason = '不支持的消息类型'
         else:
-            if conversation_id not in self.chain:
-                self.chain.memory = await self._load_memory(
-                    conversation_id=conversation_id
-                )
+            self.chain.memory = await self._load_memory(
+                conversation_id=conversation_id
+            )
             response = TextResponseMessage()
             response.text = await self.chain.arun(message.text)
 
